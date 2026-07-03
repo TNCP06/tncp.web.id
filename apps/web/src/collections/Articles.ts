@@ -7,7 +7,7 @@ import {
   forceAgentDraft,
 } from "../access";
 import { slugField } from "../fields/slug";
-import { revalidateArticleChange, revalidateArticleDelete } from "../hooks/revalidate";
+import { revalidateArticleChange, revalidateArticleDelete, setPublishedAt } from "../hooks/revalidate";
 
 // Schema now; public UI is Phase 2.
 export const Articles: CollectionConfig = {
@@ -21,7 +21,7 @@ export const Articles: CollectionConfig = {
     delete: isAdmin,
   },
   hooks: {
-    beforeChange: [forceAgentDraft],
+    beforeChange: [forceAgentDraft, setPublishedAt],
     afterChange: [revalidateArticleChange],
     afterDelete: [revalidateArticleDelete],
   },
@@ -66,5 +66,6 @@ export const Articles: CollectionConfig = {
     { name: "featured", type: "checkbox", defaultValue: false },
     { name: "featuredScore", type: "number", defaultValue: 0 },
     { name: "readingTime", type: "number", admin: { readOnly: true } },
+    { name: "publishedAt", type: "date", admin: { position: "sidebar", readOnly: true } },
   ],
 };

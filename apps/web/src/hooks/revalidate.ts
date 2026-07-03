@@ -2,6 +2,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import type {
   CollectionAfterChangeHook,
   CollectionAfterDeleteHook,
+  CollectionBeforeChangeHook,
   GlobalAfterChangeHook,
 } from "payload";
 
@@ -55,4 +56,11 @@ export const revalidateArticleChange: CollectionAfterChangeHook = ({ doc }) => {
 export const revalidateArticleDelete: CollectionAfterDeleteHook = ({ doc }) => {
   bustArticle((doc as { slug?: string }).slug);
   return doc;
+};
+
+/** Stamp publishedAt on first publish only; re-publishing never overwrites it. */
+export const setPublishedAt: CollectionBeforeChangeHook = ({ data }) => {
+  const d = data as Record<string, unknown>;
+  if (d._status === "published" && !d.publishedAt) d.publishedAt = new Date().toISOString();
+  return data;
 };

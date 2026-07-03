@@ -280,6 +280,7 @@ export interface Article {
   featured?: boolean | null;
   featuredScore?: number | null;
   readingTime?: number | null;
+  publishedAt?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -493,6 +494,7 @@ export interface ArticlesSelect<T extends boolean = true> {
   featured?: T;
   featuredScore?: T;
   readingTime?: T;
+  publishedAt?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
