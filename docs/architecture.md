@@ -1,6 +1,6 @@
 # Architecture
 
-> Last verified against code: 2026-07-03 (Stage A scaffold)
+> Last verified against code: 2026-07-03 (Stage C/D — public site live)
 
 ## Context & goal
 

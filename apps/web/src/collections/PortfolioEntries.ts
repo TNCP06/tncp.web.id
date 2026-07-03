@@ -7,6 +7,7 @@ import {
   forceAgentDraft,
 } from "../access";
 import { slugField } from "../fields/slug";
+import { revalidateEntryChange, revalidateEntryDelete } from "../hooks/revalidate";
 
 export const PortfolioEntries: CollectionConfig = {
   slug: "portfolio-entries",
@@ -22,7 +23,11 @@ export const PortfolioEntries: CollectionConfig = {
     update: updateDraftsForAgent,
     delete: isAdmin,
   },
-  hooks: { beforeChange: [forceAgentDraft] },
+  hooks: {
+    beforeChange: [forceAgentDraft],
+    afterChange: [revalidateEntryChange],
+    afterDelete: [revalidateEntryDelete],
+  },
   fields: [
     { name: "title", type: "text", required: true, localized: true },
     slugField("title"),

@@ -1,5 +1,6 @@
 import type { GlobalConfig } from "payload";
 import { isAdmin } from "../access";
+import { revalidateProfile } from "../hooks/revalidate";
 
 export const Profile: GlobalConfig = {
   slug: "profile",
@@ -7,6 +8,7 @@ export const Profile: GlobalConfig = {
     read: () => true,
     update: isAdmin,
   },
+  hooks: { afterChange: [revalidateProfile] },
   fields: [
     { name: "fullName", type: "text", required: true },
     { name: "headline", type: "text", localized: true },
