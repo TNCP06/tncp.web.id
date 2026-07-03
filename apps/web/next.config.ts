@@ -1,7 +1,8 @@
+import { withPayload } from "@payloadcms/next/withPayload";
 import type { NextConfig } from "next";
 
-// Payload is wired here in Stage B via withPayload().
-// `output: "standalone"` is added in Stage E for the Docker image.
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  // output: "standalone" is added in Stage E for the Docker image.
+};
 
-export default nextConfig;
+export default withPayload(nextConfig);
