@@ -36,12 +36,12 @@ export default async function PortfolioDetail({ params }: Params) {
   const cover = mediaUrl(entry.coverImage);
 
   return (
-    <main className="wrap">
+    <main className="wrap" style={{ paddingBottom: "4rem" }}>
       <Link className="back" href="/">
         ← Back
       </Link>
 
-      <div className="detail-head">
+      <div className="detail-head panel">
         <span className="mono">{ENTRY_TYPE_LABEL[entry.entryType] ?? "Entry"}</span>
         <h1 className="detail-title">{entry.title}</h1>
 
@@ -65,7 +65,7 @@ export default async function PortfolioDetail({ params }: Params) {
             </div>
           ) : null}
           {stack.length > 0 ? (
-            <div className="meta-item">
+            <div className="meta-item meta-item--wide">
               <dt>{labels.stack}</dt>
               <dd>{stack.join(" · ")}</dd>
             </div>
@@ -80,7 +80,15 @@ export default async function PortfolioDetail({ params }: Params) {
           alt={entry.title}
           loading="lazy"
         />
-      ) : null}
+      ) : (
+        <div className="cover entry-thumbnail-fallback" style={{ aspectRatio: "21 / 9", minHeight: "10rem", borderRadius: "8px", border: "2px solid var(--line)", overflow: "hidden" }}>
+          <svg className="entry-thumbnail-fallback-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: "3.5rem", height: "3.5rem" }}>
+            <rect x="2" y="3" width="20" height="14" rx="2" stroke="var(--slate)" strokeOpacity="0.4"/>
+            <path d="M6 8L10 11L6 14" stroke="var(--blue)" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M12 13H16" stroke="var(--blue)" strokeLinecap="round"/>
+          </svg>
+        </div>
+      )}
 
       {entry.body ? (
         <div className="prose" style={{ marginTop: "2.5rem" }}>

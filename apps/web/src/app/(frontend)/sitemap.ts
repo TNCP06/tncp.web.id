@@ -10,6 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries = await getPublishedEntries();
   return [
     { url: base, lastModified: new Date() },
+    { url: `${base}/portfolio`, lastModified: new Date() },
     ...entries
       .filter((e) => e.slug)
       .map((e) => ({

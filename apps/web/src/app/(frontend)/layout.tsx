@@ -1,22 +1,21 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Newsreader, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { SiteNav } from "./components/SiteNav";
 import "./globals.css";
 
-// Set theme before paint to avoid a flash of the wrong palette.
-const themeScript = `(function(){try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.dataset.theme=t;}catch(e){}})();`;
+// Set theme before paint to avoid a flash of the wrong palette (defaults to dark mode).
+const themeScript = `(function(){try{var t=localStorage.getItem('tncp-theme');if(t!=='light'&&t!=='dark'){t='dark';}document.documentElement.dataset.theme=t;}catch(e){}})();`;
 
-const display = Space_Grotesk({
+const display = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-display",
-  weight: ["500", "600", "700"],
+  weight: ["500", "600", "700", "800"],
   display: "swap",
 });
-const body = Newsreader({
+const body = Inter({
   subsets: ["latin"],
   variable: "--font-body",
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 const mono = JetBrains_Mono({
@@ -51,6 +50,10 @@ export default function FrontendLayout({
     >
       <body>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <div className="glow-container" aria-hidden="true">
+          <div className="glow-orb orb-1" />
+          <div className="glow-orb orb-2" />
+        </div>
         <SiteNav />
         {children}
       </body>
