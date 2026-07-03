@@ -12,6 +12,7 @@ import { PortfolioEntries } from "./collections/PortfolioEntries";
 import { Articles } from "./collections/Articles";
 import { Messages } from "./collections/Messages";
 import { Profile } from "./globals/Profile";
+import { migrations } from "./migrations";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -48,9 +49,12 @@ export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || "",
   db: sqliteAdapter({
     client: { url: process.env.DATABASE_URI || "file:./data/tncp.db" },
-    // ponytail: auto-sync schema on boot (dev + prod). Fine for a single
-    // instance; switch to `payload migrate` if schema churn gets risky.
+    // Dev auto-syncs schema via push (drizzle-kit). In production push is
+    // disabled by Payload, so prod runs committed migrations on connect —
+    // this is what creates tables for new collections on the VPS. After any
+    // schema change: `pnpm --filter web payload migrate:create <name>`, commit.
     push: true,
+    prodMigrations: migrations,
   }),
   sharp,
   typescript: {
