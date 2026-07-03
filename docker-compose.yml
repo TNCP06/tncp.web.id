@@ -3,11 +3,16 @@ services:
   web:
     image: ghcr.io/tncp06/tncp.web.id-web:latest
     restart: unless-stopped
+    # Host 3100 (3000 is taken by another project); container still listens on 3000.
+    # Cloudflare Tunnel points tncp.web.id -> localhost:3100.
     ports:
-      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:3100:3000"
     env_file: .env
+    # Bind mount (not a named volume): host ./data is owned by uid 1000
+    # (ec2-user), which matches the container's `node` user, so writes to
+    # /data (SQLite + media) work. Also makes backups a plain dir read.
     volumes:
-      - app-data:/data
+      - ./data:/data
     mem_limit: 512m
     healthcheck:
       test:
@@ -21,6 +26,3 @@ services:
       start_period: 25s
     labels:
       com.tncp.project: "tncp.web.id"
-
-volumes:
-  app-data:

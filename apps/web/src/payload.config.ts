@@ -32,6 +32,9 @@ export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || "",
   db: sqliteAdapter({
     client: { url: process.env.DATABASE_URI || "file:./data/tncp.db" },
+    // ponytail: auto-sync schema on boot (dev + prod). Fine for a single
+    // instance; switch to `payload migrate` if schema churn gets risky.
+    push: true,
   }),
   sharp,
   typescript: {
