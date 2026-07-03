@@ -13,39 +13,35 @@ Belum perlu: apa pun soal Instagram (lagi di-pause).
 
 ---
 
-## 1. Cloudflare Tunnel — tambah hostname `blog.tncp.web.id`
+## 1. Cloudflare Tunnel — tambah route `blog.tncp.web.id`
 
-Tunnel-mu sekarang sudah mengarahkan `tncp.web.id` → container (port host **3100**).
-Tinggal tambah satu hostname lagi ke container yang SAMA. Ada 2 cara — pakai yang sesuai
-setup-mu:
+Setup nyata (dari dashboard): tunnel **Cloud-Drive-Telegram**, tab **Published application
+routes**. `tncp.web.id` diarahkan ke **nama container Docker** `http://tncpwebid-web-1:3000`.
+Blog = **container yang sama** (dibedakan Host oleh middleware app), jadi tinggal tambah 1
+route dengan **service yang sama persis**.
 
-### Cara A — Dashboard (Zero Trust) — paling gampang
-1. Buka **one.dash.cloudflare.com** → **Networks → Tunnels** → pilih tunnel yang dipakai `tncp.web.id`.
-2. Tab **Public Hostname** → **Add a public hostname**:
-   - **Subdomain**: `blog`
-   - **Domain**: `tncp.web.id`
-   - **Service**: `HTTP` → `http://<yang-sama-dengan-tncp.web.id>`
-     (kalau `tncp.web.id` pakai `http://172.17.0.1:3100`, samakan; kalau `http://localhost:3100`, samakan).
-3. **Save**. Cloudflare bikin DNS otomatis. Selesai — tak perlu sentuh DNS manual.
+### Langkah (dashboard)
+1. Cloudflare One → **Networks → Connectors** (atau **Tunnels**) → tunnel **Cloud-Drive-Telegram**
+   → tab **Published application routes**.
+2. Klik **+ Add a published application route**. Isi:
+   - **Public hostname / Hostname**: `blog.tncp.web.id`
+     (kalau form pisah: **Subdomain** `blog`, **Domain** `tncp.web.id`)
+   - **Path**: `*`
+   - **Service / URL**: `http://tncpwebid-web-1:3000`  ← **sama persis** dgn baris `tncp.web.id` (copy).
+3. **Save**. Muncul baris baru `blog.tncp.web.id | * | http://tncpwebid-web-1:3000`.
 
-### Cara B — Config file (kalau tunnel-mu diatur via `config.yml` di VPS)
-Di file `config.yml` cloudflared, di bagian `ingress:` tambah SEBELUM baris `service: http_status:404`:
-```yaml
-  - hostname: blog.tncp.web.id
-    service: http://172.17.0.1:3100   # samakan dengan entri tncp.web.id
-```
-Lalu route DNS-nya:
-```bash
-cloudflared tunnel route dns <NAMA_ATAU_ID_TUNNEL> blog.tncp.web.id
-```
-Restart service cloudflared (`sudo systemctl restart cloudflared` atau restart container-nya).
+### DNS (kalau `blog.tncp.web.id` belum resolve setelah save)
+Cloudflare → domain **tncp.web.id** → **DNS → Records**:
+1. Lihat record CNAME milik `tncp.web.id` → target bentuk `xxxxxxxx.cfargotunnel.com`.
+2. **Add record**: Type **CNAME**, Name `blog`, Target = **target yang sama** itu, Proxy **ON** (oranye). Save.
 
 ### Verifikasi
-`https://blog.tncp.web.id` harus balas dari app yang sama (mungkin 404 dulu sampai route
-`(blog)` dibuat — itu normal, yang penting nyambung ke container, bukan error Cloudflare 1033).
+Buka `https://blog.tncp.web.id`:
+- **404** = SUKSES (tunnel + container nyambung; route `(blog)` belum dibangun — normal sekarang).
+- **Error DNS / 1016 / 1033** = DNS/route belum beres → cek langkah DNS di atas.
 
-> Catatan: `cloudflared` itu infra bersama antar-proyek. Cukup TAMBAH hostname; jangan
-> ubah/hapus entri proyek lain.
+> Catatan: `cloudflared` itu infra bersama. Cukup **TAMBAH** route; jangan ubah/hapus baris
+> proyek lain (`stream.*`, `drive.*`, `tncp.web.id`).
 
 ---
 
