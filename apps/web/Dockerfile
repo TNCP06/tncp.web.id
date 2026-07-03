@@ -42,7 +42,8 @@ RUN mkdir -p /data/media && chown -R node:node /data
 
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=prod-deps /app/apps/web/node_modules ./apps/web/node_modules
-COPY --from=builder /app/apps/web/.next ./apps/web/.next
+# --chown so the `node` user can write .next/cache (Next fetch cache) at runtime.
+COPY --from=builder --chown=node:node /app/apps/web/.next ./apps/web/.next
 COPY --from=builder /app/apps/web/public ./apps/web/public
 COPY apps/web/package.json apps/web/next.config.ts ./apps/web/
 COPY package.json pnpm-workspace.yaml ./

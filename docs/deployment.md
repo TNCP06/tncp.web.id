@@ -34,6 +34,16 @@ Image push authenticates with the built-in `GITHUB_TOKEN` (scope `packages: writ
 4. Cloudflare Tunnel: point `tncp.web.id` → `localhost:3000`.
 5. First run: `docker compose up -d`, then create the admin at `/admin`.
 
+## Database bootstrap (current) and migrations (TODO)
+
+Payload's `push` (schema auto-sync) only runs outside production, so a fresh prod SQLite file has no tables. Bootstrap: ship an initialized `data/tncp.db` (schema built locally by the same collections, plus placeholder seed) into the VPS bind mount once. The persistent bind mount keeps it across deploys, so redeploys keep working **as long as the schema doesn't change**.
+
+**Debt:** a schema change (new/renamed field) needs real migrations. Proper fix: `payload migrate:create` locally, ship `src/migrations` + `tsx` in the image, and run `payload migrate` at container start. Do this before the next schema change.
+
+## Networking
+
+Host port is **3100** (`tcd` already uses 3000). The container listens on 3000; compose maps `127.0.0.1:3100:3000`. Cloudflare Tunnel routes `tncp.web.id` → the container — note `cloudflared` runs in another compose project, so it reaches this container via the Docker host gateway (`172.17.0.1:3100`) or by sharing a network, not `localhost`.
+
 ## Rollback
 
 Deploy a previous image: `docker compose pull` a specific `sha-<commit>` tag (edit the image tag in compose or `docker compose up -d` after retagging), or re-run the deploy job on an earlier commit.
