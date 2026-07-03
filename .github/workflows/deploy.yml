@@ -49,8 +49,13 @@ jobs:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
+          # set -e: any failed command aborts and turns the job RED — no more
+          # false-green deploys. Path is quoted so stray whitespace in the
+          # secret can't split it into multiple `cd` args.
           script: |
-            cd ${{ secrets.DEPLOY_PATH }}
+            set -e
+            cd "${{ secrets.DEPLOY_PATH }}"
             docker compose pull
             docker compose up -d
             docker image prune -f
+            docker compose ps
