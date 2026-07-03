@@ -7,6 +7,7 @@ import {
   forceAgentDraft,
 } from "../access";
 import { slugField } from "../fields/slug";
+import { revalidateArticleChange, revalidateArticleDelete } from "../hooks/revalidate";
 
 // Schema now; public UI is Phase 2.
 export const Articles: CollectionConfig = {
@@ -19,7 +20,11 @@ export const Articles: CollectionConfig = {
     update: updateDraftsForAgent,
     delete: isAdmin,
   },
-  hooks: { beforeChange: [forceAgentDraft] },
+  hooks: {
+    beforeChange: [forceAgentDraft],
+    afterChange: [revalidateArticleChange],
+    afterDelete: [revalidateArticleDelete],
+  },
   fields: [
     { name: "title", type: "text", required: true, localized: true },
     slugField("title"),
@@ -36,5 +41,30 @@ export const Articles: CollectionConfig = {
         { label: "AI", value: "ai" },
       ],
     },
+    {
+      name: "category",
+      type: "select",
+      required: true,
+      defaultValue: "tech",
+      options: [
+        { label: "Hiburan", value: "hiburan" },
+        { label: "K-Pop", value: "kpop" },
+        { label: "Film", value: "film" },
+        { label: "Tech", value: "tech" },
+        { label: "Tips", value: "tips" },
+      ],
+    },
+    {
+      name: "sources",
+      type: "array",
+      fields: [
+        { name: "url", type: "text", required: true },
+        { name: "label", type: "text" },
+      ],
+    },
+    { name: "externalId", type: "text", unique: true, index: true, admin: { position: "sidebar", readOnly: true } },
+    { name: "featured", type: "checkbox", defaultValue: false },
+    { name: "featuredScore", type: "number", defaultValue: 0 },
+    { name: "readingTime", type: "number", admin: { readOnly: true } },
   ],
 };

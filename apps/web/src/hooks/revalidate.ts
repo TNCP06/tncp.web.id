@@ -40,3 +40,19 @@ export const revalidateProfile: GlobalAfterChangeHook = ({ doc }) => {
   });
   return doc;
 };
+
+const bustArticle = (slug?: string): void =>
+  safe(() => {
+    revalidateTag("articles");
+    revalidateTag("blog-featured");
+    if (slug) revalidateTag(`article:${slug}`);
+  });
+
+export const revalidateArticleChange: CollectionAfterChangeHook = ({ doc }) => {
+  bustArticle((doc as { slug?: string }).slug);
+  return doc;
+};
+export const revalidateArticleDelete: CollectionAfterDeleteHook = ({ doc }) => {
+  bustArticle((doc as { slug?: string }).slug);
+  return doc;
+};
