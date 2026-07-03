@@ -19,6 +19,7 @@ export default async function Home() {
   ]);
 
   const blogUrl = process.env.NEXT_PUBLIC_BLOG_URL;
+  const year = new Date().getFullYear();
   const cvUrl =
     typeof profile.cvFile === "object" && profile.cvFile ? profile.cvFile.url : null;
 
@@ -26,7 +27,10 @@ export default async function Home() {
     <>
       <header className="hero wrap">
         <p className="eyebrow">
-          <span className="status-dot" aria-hidden="true" />
+          <span
+            className={`status-dot${profile.availableForWork ? " status-dot--ok" : ""}`}
+            aria-hidden="true"
+          />
           <span className="mono">
             {profile.headline ? "Backend Developer" : "Portfolio"}
             {profile.availableForWork ? " · Available for work" : ""}
@@ -61,9 +65,11 @@ export default async function Home() {
       </header>
 
       {profile.bio ? (
-        <section className="section wrap" aria-label="About">
-          <div className="prose">
-            <RichText data={profile.bio} />
+        <section className="section wrap" id="about" aria-label="About">
+          <div className="panel">
+            <div className="prose">
+              <RichText data={profile.bio} />
+            </div>
           </div>
         </section>
       ) : null}
@@ -81,7 +87,10 @@ export default async function Home() {
             {entries.map((e) => {
               const stack = (e.techStack ?? []).filter(Boolean) as string[];
               return (
-                <article className="entry" key={e.id}>
+                <article
+                  className={`entry${e.featured ? " entry--featured" : ""}`}
+                  key={e.id}
+                >
                   <div className="entry-aside">
                     <span className="mono">
                       {ENTRY_TYPE_LABEL[e.entryType] ?? "Entry"}
@@ -113,17 +122,24 @@ export default async function Home() {
         )}
       </section>
 
-      <footer className="site-footer wrap" id="contact">
-        <span className="mono">Contact</span>
-        <div className="socials">
-          {profile.email ? (
-            <a href={`mailto:${profile.email}`}>{profile.email}</a>
-          ) : null}
-          {(profile.socials ?? []).map((s, i) => (
-            <a key={i} href={s.url} target="_blank" rel="noreferrer">
-              {s.label} ↗
-            </a>
-          ))}
+      <footer className="site-footer" id="contact">
+        <div className="wrap">
+          <span className="mono">Contact</span>
+          <div className="socials">
+            {profile.email ? (
+              <a href={`mailto:${profile.email}`}>{profile.email}</a>
+            ) : null}
+            {(profile.socials ?? []).map((s, i) => (
+              <a key={i} href={s.url} target="_blank" rel="noreferrer">
+                {s.label} ↗
+              </a>
+            ))}
+          </div>
+          <p className="foot-meta">
+            {profile.availableForWork ? "Available for work · " : ""}©{" "}
+            {year} {profile.fullName || "Tionusa Catur Pamungkas"} · Built with
+            Next.js + Payload
+          </p>
         </div>
       </footer>
     </>

@@ -9,6 +9,9 @@
   --line: #e2e2dc;
   --blue: #2d5bff;
   --blue-ink: #1b3bbf;
+  --ok: #1f9d55;
+  --nav-bg: rgba(247, 247, 244, 0.82);
+  --grid: rgba(15, 20, 25, 0.04);
 
   --font-display: "Space Grotesk", system-ui, sans-serif;
   --font-body: "Newsreader", Georgia, serif;
@@ -16,6 +19,21 @@
 
   --wrap: 68rem;
   --gap: clamp(1rem, 3vw, 2.5rem);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --paper: #0d1117;
+  --paper-raised: #161b22;
+  --ink: #e6e8eb;
+  --slate: #8b95a1;
+  --line: #232a33;
+  --blue: #6b8cff;
+  --blue-ink: #9db4ff;
+  --ok: #3fb950;
+  --nav-bg: rgba(13, 17, 23, 0.82);
+  --grid: rgba(230, 236, 245, 0.05);
 }
 
 * {
@@ -28,13 +46,27 @@ html {
 
 body {
   margin: 0;
-  background: var(--paper);
+  background-color: var(--paper);
+  /* faint blueprint grid — fills empty space, nods to the systems theme */
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 46px 46px;
   color: var(--ink);
   font-family: var(--font-body);
   font-size: 1.0625rem;
   line-height: 1.6;
   font-synthesis: none;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+[id] {
+  scroll-margin-top: 4.75rem;
 }
 
 a {
@@ -176,6 +208,13 @@ img {
   margin: 0;
 }
 
+/* Raised panel to lift a section off the grid background */
+.panel {
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  padding: clamp(1.5rem, 4vw, 2.75rem);
+}
+
 /* ── Prose (rich text) ───────────────────────────────────────── */
 .prose {
   max-width: 60ch;
@@ -201,12 +240,27 @@ img {
   display: grid;
   grid-template-columns: 12rem 1fr;
   gap: var(--gap);
-  padding-block: 2rem;
+  padding: 2rem 1rem;
   border-top: 1px solid var(--line);
+  transition: background-color 0.15s ease;
 }
 
 .entry:last-child {
   border-bottom: 1px solid var(--line);
+}
+
+.entry:hover {
+  background: var(--paper-raised);
+}
+
+/* featured entries carry a blue rail + tint to stand out */
+.entry--featured {
+  border-left: 2px solid var(--blue);
+  background: color-mix(in srgb, var(--blue) 5%, transparent);
+}
+
+.entry--featured:hover {
+  background: color-mix(in srgb, var(--blue) 9%, transparent);
 }
 
 .entry-aside {
@@ -289,9 +343,18 @@ img {
 
 /* ── Footer ──────────────────────────────────────────────────── */
 .site-footer {
+  background: var(--paper-raised);
   padding-block: clamp(3rem, 7vw, 5rem);
-  border-top: 1px solid var(--line);
-  margin-top: 2rem;
+  border-top: 2px solid var(--ink);
+  margin-top: 3rem;
+}
+
+.foot-meta {
+  margin: 2rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  color: var(--slate);
 }
 
 .socials {
@@ -400,7 +463,93 @@ img {
   }
 }
 
+/* ── Nav ─────────────────────────────────────────────────────── */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--nav-bg);
+  backdrop-filter: saturate(180%) blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  height: 3.5rem;
+}
+
+.nav-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.nav-link {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--slate);
+  padding: 0.4rem 0.6rem;
+}
+
+.nav-link:hover {
+  color: var(--ink);
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  margin-left: 0.35rem;
+  border: 1px solid var(--line);
+  background: var(--paper-raised);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 0.95rem;
+  line-height: 1;
+  transition: border-color 0.15s ease;
+}
+
+.theme-toggle:hover {
+  border-color: var(--ink);
+}
+
+/* status dot turns green when available for work */
+.status-dot--ok {
+  background: var(--ok);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ok) 18%, transparent);
+}
+
+@media (max-width: 26rem) {
+  .nav-link {
+    padding: 0.4rem 0.4rem;
+    font-size: 0.68rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   * {
     transition: none !important;
     animation: none !important;
