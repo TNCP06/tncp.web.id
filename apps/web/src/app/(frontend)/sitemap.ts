@@ -3,6 +3,9 @@ import { getPublishedEntries } from "@/lib/payload";
 
 const base = process.env.SITE_URL || "http://localhost:3000";
 
+// Queried at request time (DB is a runtime volume).
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries = await getPublishedEntries();
   return [

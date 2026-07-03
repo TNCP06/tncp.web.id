@@ -4,6 +4,9 @@ import { RichText } from "@payloadcms/richtext-lexical/react";
 import { getProfile, getPublishedEntries } from "@/lib/payload";
 import { ENTRY_TYPE_LABEL } from "@/lib/format";
 
+// Rendered on demand (DB is a runtime volume); data is cached via tags.
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata(): Promise<Metadata> {
   const profile = await getProfile();
   return {

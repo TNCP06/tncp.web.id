@@ -2,15 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RichText } from "@payloadcms/richtext-lexical/react";
-import { getEntryBySlug, getPublishedEntries } from "@/lib/payload";
+import { getEntryBySlug } from "@/lib/payload";
 import { ENTRY_TYPE_LABEL, metaLabels, periodOf } from "@/lib/format";
 
 type Params = { params: Promise<{ slug: string }> };
 
-export async function generateStaticParams() {
-  const entries = await getPublishedEntries();
-  return entries.map((e) => ({ slug: e.slug ?? "" })).filter((p) => p.slug);
-}
+// Rendered on demand (DB is a runtime volume); data is cached via tags.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
