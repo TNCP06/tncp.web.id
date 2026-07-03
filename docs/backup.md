@@ -26,7 +26,7 @@ TG_CHAT_ID=<target chat/channel id>
 
 ## Drive visibility (via tcd)
 
-If `TG_CHAT_ID` is the **tcd storage channel** (the one tcd indexes) and `TG_BOT_TOKEN`'s bot is an **admin of that channel but not tcd's own indexer bot**, the caption `backup/tncp-backup-<ts> | 1/1 | backup` follows tcd's index contract, so tcd's bot auto-files the archive in the cloud-drive under a `backup/` folder (`TG_FOLDER`, default `backup`). The file lives in Telegram regardless — if tcd's indexer changes, the backup is still safe, only the drive listing is affected. No writes to tcd's database.
+If `TG_CHAT_ID` is the **tcd storage channel** (the one tcd indexes) and `TG_BOT_TOKEN`'s bot is an **admin of that channel but not tcd's own indexer bot**, the caption `Backup/tncp.web.id/tncp-backup-<ts> | 1/1 | backup` follows tcd's index contract, so tcd's bot auto-files the archive in the cloud-drive under `Backup/tncp.web.id/` (`TG_FOLDER`, default `Backup/tncp.web.id` — mirrors tcd's own `Backup/CDT DB/`). The file lives in Telegram regardless — if tcd's indexer changes, the backup is still safe, only the drive listing is affected. No writes to tcd's database.
 
 ## Schedule
 
