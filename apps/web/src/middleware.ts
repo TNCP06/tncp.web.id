@@ -7,6 +7,13 @@ export function middleware(req: NextRequest) {
   const host = req.headers.get("host") ?? "";
   const isBlog = host.startsWith("blog.");
   const { pathname } = req.nextUrl;
+
+  // /_blog/* is an internal path — only reachable via the blog-host rewrite.
+  // Block direct access on the main host to avoid duplicate content.
+  if (!isBlog && pathname.startsWith("/_blog")) {
+    return new NextResponse(null, { status: 404 });
+  }
+
   if (
     isBlog &&
     !pathname.startsWith("/admin") &&
