@@ -1,0 +1,32 @@
+# Architecture
+
+> Last verified against code: 2026-07-03 (Stage A scaffold)
+
+## Context & goal
+
+`tncp.web.id` is the personal profile + portfolio site of Tionusa Catur Pamungkas (backend developer). Audience: recruiters and engineers. Content is curated manually now via the Payload admin; an AI agent curates it in Phase 3 (separate app/repo).
+
+## Components
+
+- **apps/web** — Next.js (App Router) + Payload CMS 3 in one process:
+  - Public pages (`/`, `/portfolio/[slug]`) rendered from Payload data via the Local API.
+  - `/admin` — Payload admin panel.
+  - REST API + media uploads (single origin, `/data/media`).
+- **SQLite** — single file under `/data`; migration = copy the volume.
+- **Cloudflare Tunnel** (existing) — exposes the container (`127.0.0.1:3000`) at `tncp.web.id`.
+- **CI/CD** — GitHub Actions builds the Docker image → GHCR → the VPS pulls.
+- **Backup** — host cron encrypts a SQLite snapshot + media and hands it to the existing Telegram uploader.
+
+## Key decisions & trade-offs
+
+- **Payload + SQLite (embedded)** — one process, low RAM, no separate CMS service. Trade-off: SQLite is single-writer; fine for this write volume.
+- **Self-host on EC2, no Vercel** — reuse the existing box + tunnel, no vendor lock-in, full control. Trade-off: we own ops (deploy, backup).
+- **Build in CI, not on the VPS** — the small EC2 would OOM building Next.js. Trade-off: the VPS needs GHCR pull access.
+- **Bilingual via Payload localization** — native, no extra library.
+
+## Integration points
+
+- Payload hooks → Next.js `revalidateTag`/`revalidatePath` (internal, no webhook).
+- Phase 3 AI agent talks to this app only via REST API + an `agent` API key (draft-only access).
+
+Diagrams: TODO — add ASCII/mermaid as the system solidifies.

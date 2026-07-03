@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+.next/
+out/
+dist/
+.turbo/
+*.tsbuildinfo
+
+# Runtime data & secrets — never commit
+/data/
+apps/web/data/
+.env
+.env.*
+!.env.example
+*.pem
+docs/local/
+
+# Local-only instruction files (contain server details / secrets)
+prompt-claude-code.md
+panduan-manual.md
+CLAUDE.md
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+*.log
