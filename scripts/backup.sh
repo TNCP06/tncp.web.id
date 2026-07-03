@@ -64,10 +64,14 @@ openssl enc -aes-256-cbc -pbkdf2 -salt -pass env:BACKUP_PASSPHRASE \
 log "encrypted -> $(basename "$ENC") ($(du -h "$ENC" | cut -f1))"
 
 # 4) Ship to Telegram.
+# When TG_CHAT_ID is the tcd storage channel, this caption follows tcd's index
+# contract ("Folder/Title | part/total | tags") so tcd's bot auto-files the
+# backup in the drive under $TG_FOLDER/. For a plain chat it is just a caption.
+TG_FOLDER="${TG_FOLDER:-backup}"
 HTTP=$(curl -s -o "$WORK/tg.json" -w '%{http_code}' \
   -F "chat_id=$TG_CHAT_ID" \
   -F "document=@$ENC" \
-  -F "caption=tncp.web.id backup $TS" \
+  -F "caption=$TG_FOLDER/tncp-backup-$TS | 1/1 | backup" \
   "$TG_API/bot$TG_BOT_TOKEN/sendDocument")
 if [ "$HTTP" = "200" ] && grep -q '"ok":true' "$WORK/tg.json"; then
   log "telegram upload ok"
