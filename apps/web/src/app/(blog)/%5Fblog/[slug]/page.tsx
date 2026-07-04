@@ -82,10 +82,7 @@ export default async function ArticlePage({ params }: Params) {
 
       <span className="k-chip">{CAT[article.category] ?? article.category}</span>
       <h1 className="k-article__title">{article.title}</h1>
-      <p className="k-article__meta">
-        {date}
-        {article.readingTime ? ` · ${article.readingTime} mnt baca` : ""}
-      </p>
+      <p className="k-article__meta">{date}</p>
 
       {article.body ? (
         <div className="k-prose">

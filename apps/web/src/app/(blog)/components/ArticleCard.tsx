@@ -40,8 +40,14 @@ export function ArticleCard({ article }: { article: Article }) {
         {!isEntertainment && article.excerpt ? (
           <p className="k-card-excerpt">{article.excerpt}</p>
         ) : null}
-        {article.readingTime ? (
-          <span className="k-card-meta">{article.readingTime} MNT BACA</span>
+        {article.publishedAt ? (
+          <span className="k-card-meta">
+            {new Date(article.publishedAt).toLocaleDateString("id-ID", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
+          </span>
         ) : null}
       </div>
     </a>
