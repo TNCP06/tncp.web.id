@@ -85,6 +85,13 @@ export const PortfolioEntries: CollectionConfig = {
       admin: { position: "sidebar" },
     },
     {
+      name: "externalId",
+      type: "text",
+      unique: true,
+      index: true,
+      admin: { position: "sidebar", readOnly: true },
+    },
+    {
       name: "curation",
       type: "group",
       admin: {
