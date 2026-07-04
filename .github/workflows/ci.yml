@@ -15,6 +15,12 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
+      # Apply migrations once before the build; next build's parallel workers
+      # otherwise race prodMigrations on the same SQLite file (SQLITE_BUSY).
+      - run: pnpm --filter web payload migrate
+        env:
+          PAYLOAD_SECRET: ci-placeholder
+          DATABASE_URI: file:/tmp/ci.db
       - run: pnpm build
         env:
           PAYLOAD_SECRET: ci-placeholder
