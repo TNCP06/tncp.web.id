@@ -14,6 +14,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const doc = await payload.update({ collection: "articles", id, data: { _status: "published" } as never, locale: "id" })
     .catch(() => null);
   if (!doc) return NextResponse.json({ error: "not found" }, { status: 404 });
-  const base = process.env.NEXT_PUBLIC_BLOG_URL ?? process.env.SITE_URL ?? "";
+  const base = process.env.NEXT_PUBLIC_BLOG_URL || process.env.SITE_URL || "";
   return NextResponse.json({ id: doc.id, slug: doc.slug, url: `${base}/${doc.slug}` }, { status: 200 });
 }

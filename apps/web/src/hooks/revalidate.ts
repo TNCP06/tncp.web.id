@@ -59,8 +59,14 @@ export const revalidateArticleDelete: CollectionAfterDeleteHook = ({ doc }) => {
 };
 
 /** Stamp publishedAt on first publish only; re-publishing never overwrites it. */
-export const setPublishedAt: CollectionBeforeChangeHook = ({ data }) => {
+export const setPublishedAt: CollectionBeforeChangeHook = ({ data, originalDoc }) => {
   const d = data as Record<string, unknown>;
-  if (d._status === "published" && !d.publishedAt) d.publishedAt = new Date().toISOString();
+  // `data` is only the INCOMING fields (e.g. the publish route sends just
+  // {_status:"published"}) — the persisted value lives on originalDoc, so it
+  // must be checked too or every re-publish re-stamps publishedAt.
+  const already = (originalDoc as { publishedAt?: unknown } | undefined)?.publishedAt;
+  if (d._status === "published" && !d.publishedAt && !already) {
+    d.publishedAt = new Date().toISOString();
+  }
   return data;
 };

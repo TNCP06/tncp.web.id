@@ -54,14 +54,16 @@ export async function POST(req: NextRequest) {
     sources: Array.isArray(sources) ? sources : [],
     featured: !!featured, featuredScore: Number(featuredScore) || 0,
     readingTime: readingTimeMinutes(String(bodyMarkdown)),
-    externalId, _status: "draft",
+    externalId,
     ...(coverImage ? { coverImage } : {}),
   };
 
   const existing = await payload.find({ collection: "articles", where: { externalId: { equals: externalId } }, limit: 1, locale: "id" });
+  // On update, never touch _status — re-ingesting a published article must not
+  // unpublish it. Only a brand-new article is created as a draft.
   const doc = existing.docs[0]
     ? await payload.update({ collection: "articles", id: existing.docs[0].id, data: data as never, locale: "id" })
-    : await payload.create({ collection: "articles", data: data as never, locale: "id" });
+    : await payload.create({ collection: "articles", data: { ...data, _status: "draft" } as never, locale: "id" });
 
   const adminUrl = `${process.env.SITE_URL ?? ""}/admin/collections/articles/${doc.id}`;
   return NextResponse.json({ id: doc.id, slug: doc.slug, status: "draft", adminUrl }, { status: 201 });
