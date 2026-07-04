@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPayload } from "payload";
 import config from "@payload-config";
+import sharp from "sharp";
 import { markdownToLexical, readingTimeMinutes } from "@/lib/ingest";
 
 function authorized(req: NextRequest): boolean {
@@ -37,11 +38,28 @@ export async function POST(req: NextRequest) {
   let coverImage: number | undefined;
   const cover = form.get("cover");
   if (cover && typeof cover === "object" && "arrayBuffer" in cover) {
-    const buf = Buffer.from(await (cover as File).arrayBuffer());
+    const raw = Buffer.from(await (cover as File).arrayBuffer());
+    // Covers from agy are ~2MB PNGs. Downscale to <=1600w and re-encode as
+    // WebP q80 (near-lossless, ~10x smaller) to save storage + bandwidth.
+    // Fall back to the original bytes if sharp can't decode it.
+    let buf = raw;
+    let mimetype = (cover as File).type || "image/png";
+    let name = (cover as File).name || `${externalId}.png`;
+    try {
+      buf = await sharp(raw)
+        .rotate()
+        .resize({ width: 1600, withoutEnlargement: true })
+        .webp({ quality: 80 })
+        .toBuffer();
+      mimetype = "image/webp";
+      name = `${externalId}.webp`;
+    } catch {
+      /* keep original bytes */
+    }
     const media = await payload.create({
       collection: "media",
       data: { alt: String(title).slice(0, 200) },
-      file: { data: buf, mimetype: (cover as File).type || "image/png", name: (cover as File).name || `${externalId}.png`, size: buf.length },
+      file: { data: buf, mimetype, name, size: buf.length },
     });
     coverImage = media.id;
   }
