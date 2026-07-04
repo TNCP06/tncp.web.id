@@ -94,6 +94,9 @@ export const PortfolioEntries: CollectionConfig = {
     {
       name: "curation",
       type: "group",
+      // Private: AI audit fields (rationale, rubric scores, source). Only readable
+      // by logged-in admins — never exposed on the public REST API / portfolio pages.
+      access: { read: ({ req }) => Boolean(req.user) },
       admin: {
         description: "Set by the Phase 3 AI agent; leave defaults for manual entries.",
       },
