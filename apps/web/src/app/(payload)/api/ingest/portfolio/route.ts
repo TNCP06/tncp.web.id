@@ -44,6 +44,21 @@ export async function POST(req: NextRequest) {
   if (prev && prev.curation?.source === "manual") {
     return NextResponse.json({ error: "manual entry — refusing to overwrite" }, { status: 409 });
   }
+  // Preserve manual edits: if the owner changed this AI entry AFTER the AI last
+  // wrote it (updatedAt clearly later than curatedAt), don't clobber it with a
+  // fresh regenerate. Not a permanent lock — it just won't overwrite your edits
+  // with outdated info. (10s buffer covers the AI's own write cycle.)
+  if (prev) {
+    const curatedAt = Date.parse(prev.curation?.curatedAt ?? "") || 0;
+    const updatedAt = Date.parse(prev.updatedAt ?? "") || 0;
+    if (curatedAt && updatedAt > curatedAt + 10_000) {
+      return NextResponse.json({ skipped: true, reason: "manually edited — preserved" }, { status: 200 });
+    }
+  }
+  // refresh sends updateOnly: never re-create an entry the owner deleted.
+  if (!prev && updateOnly) {
+    return NextResponse.json({ skipped: true, reason: "not found (updateOnly)" }, { status: 200 });
+  }
 
   const data: Record<string, unknown> = {
     title,
