@@ -32,6 +32,12 @@ export const metadata: Metadata = {
   ),
   title: { default: "KANAL", template: "%s · KANAL" },
   description: "Hiburan, tech, dan tips — dijelasin santai.",
+  icons: { icon: "/kanal-icon.svg" },
+  openGraph: {
+    type: "website",
+    siteName: "KANAL",
+    images: ["/kanal-logo.png"],
+  },
 };
 
 export default function BlogLayout({
