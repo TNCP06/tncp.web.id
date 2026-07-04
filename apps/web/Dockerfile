@@ -27,6 +27,11 @@ ENV DATABASE_URI=file:/tmp/build.db
 # nav link renders. Override with --build-arg NEXT_PUBLIC_BLOG_URL=… if it moves.
 ARG NEXT_PUBLIC_BLOG_URL=https://blog.tncp.web.id
 ENV NEXT_PUBLIC_BLOG_URL=$NEXT_PUBLIC_BLOG_URL
+# Apply Payload migrations ONCE, single-process, before the build. Otherwise
+# next build's parallel static-generation workers each run prodMigrations on the
+# same SQLite file and race -> "SQLITE_BUSY: database is locked" / half-applied
+# schema. Pre-migrating leaves the workers with nothing to write (read-only).
+RUN pnpm --filter web payload migrate
 RUN pnpm --filter web build
 
 # ── Prod deps only (smaller runtime; installs the linux libsql/sharp binaries) ──
