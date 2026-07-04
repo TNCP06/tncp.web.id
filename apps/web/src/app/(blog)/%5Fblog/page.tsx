@@ -6,15 +6,6 @@ import { ArticleCard } from "../components/ArticleCard";
 // Rendered on demand (DB is a runtime volume); data is cached via tags (see lib/blog.ts).
 export const dynamic = "force-dynamic";
 
-const TABS = [
-  ["", "Semua"],
-  ["hiburan", "Hiburan"],
-  ["kpop", "K-Pop"],
-  ["film", "Film"],
-  ["tech", "Tech"],
-  ["tips", "Tips"],
-] as const;
-
 export default async function BlogHome({
   searchParams,
 }: {
@@ -31,17 +22,6 @@ export default async function BlogHome({
   return (
     <main className="k-wrap">
       {!cat && slides.length > 0 ? <Hero slides={slides} /> : null}
-      <nav className="k-tabs">
-        {TABS.map(([v, label]) => (
-          <a
-            key={v}
-            href={v ? `/?cat=${v}` : "/"}
-            className={`k-tab${(cat ?? "") === v ? " k-tab--active" : ""}`}
-          >
-            {label}
-          </a>
-        ))}
-      </nav>
       <div className="k-grid">
         {list.docs.map((a) => (
           <ArticleCard key={a.id} article={a} />

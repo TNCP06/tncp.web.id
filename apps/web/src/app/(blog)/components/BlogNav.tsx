@@ -1,14 +1,19 @@
+"use client";
+
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { ThemeToggle } from "./ThemeToggle";
 
 const tabs = [
-  { label: "Semua", href: "/" },
-  { label: "Hiburan", href: "/?cat=hiburan" },
-  { label: "Tech", href: "/?cat=tech" },
-  { label: "Tips", href: "/?cat=tips" },
+  { label: "Semua", value: "", href: "/" },
+  { label: "Hiburan", value: "hiburan", href: "/?cat=hiburan" },
+  { label: "Tech", value: "tech", href: "/?cat=tech" },
+  { label: "Tips", value: "tips", href: "/?cat=tips" },
 ];
 
 export function BlogNav() {
+  const cat = useSearchParams().get("cat") ?? "";
+
   return (
     <nav className="k-nav">
       <div className="k-wrap k-nav-inner">
@@ -18,10 +23,9 @@ export function BlogNav() {
         <div className="k-nav-links">
           <div className="k-tabs">
             {tabs.map((t) => (
-              // ponytail: "Semua" is the static active tab; Task 7's feed wires cat-aware active state
               <Link
                 key={t.label}
-                className={`k-tab${t.href === "/" ? " k-tab--active" : ""}`}
+                className={`k-tab${t.value === cat ? " k-tab--active" : ""}`}
                 href={t.href}
               >
                 {t.label}

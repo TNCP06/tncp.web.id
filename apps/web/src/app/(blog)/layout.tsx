@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import { BlogNav } from "./components/BlogNav";
 import "./blog.css";
@@ -46,7 +47,9 @@ export default function BlogLayout({
     >
       <body>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-        <BlogNav />
+        <Suspense fallback={null}>
+          <BlogNav />
+        </Suspense>
         {children}
       </body>
     </html>
