@@ -1,6 +1,6 @@
 # Business flow
 
-> Last verified against code: 2026-07-03 (Stage A scaffold)
+> Last verified against code: 2026-07-04 (Blog Phase 2 live)
 
 ## Portfolio entry lifecycle
 
@@ -13,7 +13,9 @@
 
 ## Article lifecycle
 
-Schema exists from Stage B; public UI is Phase 2. Same draft → publish rule.
+- **Draft**: created by Personal-Assistant-AI via `POST /api/ingest/article` (`INGEST_SECRET`-guarded), or manually in `/admin`.
+- **Publish**: `POST /api/ingest/article/[id]/publish`, or a manual publish in `/admin` — sets `publishedAt`, and the `afterChange` hook revalidates.
+- **Live**: published articles appear on the blog (`blog.tncp.web.id`) — index, category tabs, article page, RSS/sitemap.
 
 ## Content path
 

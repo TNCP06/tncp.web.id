@@ -63,7 +63,7 @@ export default async function ArticlePage({ params }: Params) {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: article.title,
-    ...(cover ? { image: new URL(cover, process.env.NEXT_PUBLIC_BLOG_URL ?? "https://blog.tncp.web.id").toString() } : {}),
+    ...(cover ? { image: new URL(cover, process.env.NEXT_PUBLIC_BLOG_URL || "https://blog.tncp.web.id").toString() } : {}),
     datePublished: article.publishedAt || undefined,
     dateModified: article.updatedAt,
     author: { "@type": "Organization", name: "KANAL" },
