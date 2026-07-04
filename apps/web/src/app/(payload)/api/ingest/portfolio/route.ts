@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
   const {
     externalId, title, entryType, summary, bodyMarkdown, techStack, links, startDate,
     endDate, isOngoing, featured, priorityScore, rationale, rubricScores, sourceRepo,
+    updateOnly,
   } = body;
   if (!externalId || !title) {
     return NextResponse.json({ error: "externalId, title required" }, { status: 400 });
