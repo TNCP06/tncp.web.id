@@ -1,6 +1,6 @@
 # Data model
 
-> Last verified against code: 2026-07-03 (Stage B — `apps/web/src/collections`, `globals`, `payload.config.ts`)
+> Last verified against code: 2026-07-04 (Blog Phase 2 Task 1 — `apps/web/src/collections/Articles.ts`, `apps/web/src/hooks/revalidate.ts`)
 
 Localization: locales `id` (default) + `en`, fallback on. Fields marked *(loc)* are localized.
 
@@ -56,6 +56,15 @@ Drafts on; same access as portfolio-entries. Public UI is Phase 2.
 | coverImage | upload → media | |
 | tags | text hasMany | |
 | source | select | manual\|ai (default manual) |
+| category | select | hiburan\|kpop\|film\|tech\|tips (default tech), required |
+| sources | array | { url (required), label } |
+| externalId | text | unique, sidebar, read-only |
+| featured | checkbox | default false |
+| featuredScore | number | default 0 |
+| readingTime | number | read-only |
+| publishedAt | date | set on first publish by the `setPublishedAt` hook; read-only in admin |
+
+Revalidation tags (`hooks/revalidate.ts`): `articles`, `article:<slug>`, `blog-featured`.
 
 ## Collection `users` (`collections/Users.ts`)
 

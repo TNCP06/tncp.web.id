@@ -268,6 +268,19 @@ export interface Article {
   coverImage?: (number | null) | Media;
   tags?: string[] | null;
   source?: ('manual' | 'ai') | null;
+  category: 'hiburan' | 'kpop' | 'film' | 'tech' | 'tips';
+  sources?:
+    | {
+        url: string;
+        label?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  externalId?: string | null;
+  featured?: boolean | null;
+  featuredScore?: number | null;
+  readingTime?: number | null;
+  publishedAt?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -469,6 +482,19 @@ export interface ArticlesSelect<T extends boolean = true> {
   coverImage?: T;
   tags?: T;
   source?: T;
+  category?: T;
+  sources?:
+    | T
+    | {
+        url?: T;
+        label?: T;
+        id?: T;
+      };
+  externalId?: T;
+  featured?: T;
+  featuredScore?: T;
+  readingTime?: T;
+  publishedAt?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;

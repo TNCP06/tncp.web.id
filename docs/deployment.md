@@ -1,6 +1,6 @@
 # Deployment
 
-> Last verified against code: 2026-07-03 (Stage E — Docker + CI/CD authored; first deploy pending)
+> Last verified against code: 2026-07-03 (Stage E live; prod migrations wired via prodMigrations)
 
 ## Model
 
@@ -11,7 +11,7 @@ The image ships the built `.next` plus production `node_modules` (`next start`),
 ## Files
 
 - `apps/web/Dockerfile` — multi-stage (deps → build → prod-deps → runner on `node:20-bookworm-slim`).
-- `docker-compose.yml` — one service, `127.0.0.1:3000:3000`, volume `app-data:/data`, `mem_limit: 512m`, healthcheck on `/api/health`, label `com.tncp.project=tncp.web.id`.
+- `docker-compose.yml` — one service, `127.0.0.1:3100:3000`, volume `app-data:/data`, `mem_limit: 512m`, healthcheck on `/api/health`, label `com.tncp.project=tncp.web.id`.
 - `.github/workflows/ci.yml` — PR + push: `pnpm typecheck` + `pnpm build`.
 - `.github/workflows/deploy.yml` — push to `main`: build & push image to GHCR, then deploy over SSH.
 
@@ -34,11 +34,17 @@ Image push authenticates with the built-in `GITHUB_TOKEN` (scope `packages: writ
 4. Cloudflare Tunnel: point `tncp.web.id` → `localhost:3000`.
 5. First run: `docker compose up -d`, then create the admin at `/admin`.
 
-## Database bootstrap (current) and migrations (TODO)
+## Database migrations
 
-Payload's `push` (schema auto-sync) only runs outside production, so a fresh prod SQLite file has no tables. Bootstrap: ship an initialized `data/tncp.db` (schema built locally by the same collections, plus placeholder seed) into the VPS bind mount once. The persistent bind mount keeps it across deploys, so redeploys keep working **as long as the schema doesn't change**.
+Payload's `push` (schema auto-sync via drizzle-kit) only runs outside production. Dev uses `push`; prod runs committed migrations. `payload.config.ts` wires `prodMigrations: migrations` (from `src/migrations`), which Payload applies on connect in production.
 
-**Debt:** a schema change (new/renamed field) needs real migrations. Proper fix: `payload migrate:create` locally, ship `src/migrations` + `tsx` in the image, and run `payload migrate` at container start. Do this before the next schema change.
+**After any schema change** (new/renamed collection or field):
+1. `pnpm --filter web payload migrate:create <name>` locally — generates a `src/migrations/*.ts` + `*.json` snapshot and updates `index.ts`.
+2. Commit them. CI bakes them into the image; prod applies pending ones on the next deploy.
+
+**Never hand-create tables/columns on the prod DB.** `migrate:create` diffs against the last snapshot — a manual schema edit makes prod drift silently from the snapshot, and a later baseline records migrations as "run" over a schema that never actually matched. This is exactly what broke `/admin` on 2026-07-03: the `messages` table was created manually but `payload_locked_documents_rels.messages_id` was missed, then the initial migration was baselined over the mismatch, so admin's `select ... messages_id` hit `no such column`. Let migrations do the work on a matching DB instead.
+
+If prod ever does drift, the recovery is to apply the exact DDL the migration snapshot expects (`src/migrations/*.ts`) so prod matches what the recorded migrations claim — then it's back in sync.
 
 ## Networking
 

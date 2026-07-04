@@ -22,6 +22,11 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # Config init needs these; values are irrelevant to the build output.
 ENV PAYLOAD_SECRET=build-time-placeholder
 ENV DATABASE_URI=file:/tmp/build.db
+# NEXT_PUBLIC_* are inlined into the client bundle at build time, not read at
+# runtime — so the VPS .env can't set them. Bake the blog URL here so the "Blog"
+# nav link renders. Override with --build-arg NEXT_PUBLIC_BLOG_URL=… if it moves.
+ARG NEXT_PUBLIC_BLOG_URL=https://blog.tncp.web.id
+ENV NEXT_PUBLIC_BLOG_URL=$NEXT_PUBLIC_BLOG_URL
 RUN pnpm --filter web build
 
 # ── Prod deps only (smaller runtime; installs the linux libsql/sharp binaries) ──

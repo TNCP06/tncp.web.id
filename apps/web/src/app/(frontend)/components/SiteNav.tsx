@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { ThemeToggle } from "./ThemeToggle";
 
-// Blog lives on its own subdomain (Phase 2). Overridable via env for local testing.
-const blogUrl = process.env.NEXT_PUBLIC_BLOG_URL || "https://blog.tncp.web.id";
+// Blog lives on its own subdomain (Phase 2). Empty env hides the link (see .env.example).
+const blogUrl = process.env.NEXT_PUBLIC_BLOG_URL || "";
 
 export function SiteNav() {
   return (
@@ -21,9 +21,11 @@ export function SiteNav() {
           <Link className="nav-link" href="/#contact">
             Contact
           </Link>
-          <a className="nav-link" href={blogUrl}>
-            Blog
-          </a>
+          {blogUrl ? (
+            <a className="nav-link" href={blogUrl}>
+              Blog
+            </a>
+          ) : null}
           <ThemeToggle />
         </div>
       </div>

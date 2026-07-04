@@ -1,6 +1,6 @@
 # Architecture
 
-> Last verified against code: 2026-07-03 (Stage C/D — public site live)
+> Last verified against code: 2026-07-04 (Stage C/D — public site live + Blog Phase 2)
 
 ## Context & goal
 
@@ -13,7 +13,7 @@
   - `/admin` — Payload admin panel.
   - REST API + media uploads (single origin, `/data/media`).
 - **SQLite** — single file under `/data`; migration = copy the volume.
-- **Cloudflare Tunnel** (existing) — exposes the container (`127.0.0.1:3000`) at `tncp.web.id`.
+- **Cloudflare Tunnel** (existing) — exposes the container at `tncp.web.id`; the container listens on `3000`, but compose maps host `127.0.0.1:3100` → container `3000` (host `3000` is already taken by another project on the VPS — see `docs/deployment.md`).
 - **CI/CD** — GitHub Actions builds the Docker image → GHCR → the VPS pulls.
 - **Backup** — host cron encrypts a SQLite snapshot + media and hands it to the existing Telegram uploader.
 
@@ -28,5 +28,9 @@
 
 - Payload hooks → Next.js `revalidateTag`/`revalidatePath` (internal, no webhook).
 - Phase 3 AI agent talks to this app only via REST API + an `agent` API key (draft-only access).
+
+## Blog (Phase 2)
+
+KANAL, the blog, is served on `blog.tncp.web.id` — same Next.js process, no separate deploy. Host middleware (`apps/web/src/middleware.ts`) rewrites requests on the `blog.` host to the `(blog)` route group; the main host (`tncp.web.id`) is untouched. Content is ingested from Personal-Assistant-AI as draft articles via `/api/ingest/*`, guarded by a shared `INGEST_SECRET` bearer token; publish sets `publishedAt` and revalidates like the rest of the site.
 
 Diagrams: TODO — add ASCII/mermaid as the system solidifies.
