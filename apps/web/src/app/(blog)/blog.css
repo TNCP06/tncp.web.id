@@ -481,6 +481,86 @@ a {
   padding-left: 1.4rem;
 }
 
+/* ── Article page ────────────────────────────────────────────── */
+.k-article {
+  padding-block: clamp(1.5rem, 4vw, 2.5rem) clamp(3rem, 6vw, 4rem);
+}
+.k-back {
+  display: inline-block;
+  font-family: var(--k-mono), monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--k-muted);
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+  transition: color 0.2s ease;
+}
+.k-back:hover {
+  color: var(--k-accent);
+}
+.k-article__cover {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--k-radius);
+  margin-bottom: 1.5rem;
+}
+.k-article__title {
+  font-family: var(--k-display), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.8rem, 4.5vw, 2.75rem);
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  margin: 0.75rem 0 0;
+}
+.k-article__meta {
+  font-family: var(--k-mono), monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--k-faint);
+  margin: 0.75rem 0 2rem;
+}
+.k-article .k-prose {
+  margin-inline: auto;
+}
+
+/* ── Sources & related (article page) ────────────────────────── */
+.k-sources {
+  max-width: 44rem;
+  margin: 3rem auto 0;
+}
+.k-sources h3 {
+  font-family: var(--k-display), system-ui, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+}
+.k-sources ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.k-sources a {
+  color: var(--k-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-size: 0.92rem;
+}
+.k-related {
+  margin-top: 3.5rem;
+}
+.k-related h3 {
+  font-family: var(--k-display), system-ui, sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 1.25rem;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation: none !important;
