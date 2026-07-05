@@ -1,7 +1,7 @@
 # tncp.web.id
 
-Personal platform — profile, portfolio, and the **KANAL** blog — for Tionusa Catur
-Pamungkas, backend developer.
+Personal platform for Tionusa Catur Pamungkas, Fullstack developer: a portfolio site plus
+the **KANAL** blog, both served from one app in this repo.
 
 [![CI](https://github.com/TNCP06/tncp.web.id/actions/workflows/ci.yml/badge.svg)](https://github.com/TNCP06/tncp.web.id/actions/workflows/ci.yml)
 [![Deploy](https://github.com/TNCP06/tncp.web.id/actions/workflows/deploy.yml/badge.svg)](https://github.com/TNCP06/tncp.web.id/actions/workflows/deploy.yml)
@@ -10,14 +10,65 @@ Pamungkas, backend developer.
 ![SQLite](https://img.shields.io/badge/SQLite-WAL-003B57?logo=sqlite)
 ![pnpm](https://img.shields.io/badge/pnpm-workspaces-F69220?logo=pnpm)
 
-A **pnpm workspaces + Turborepo** monorepo. The Phase 1 app is `apps/web`: Next.js
-(App Router) with **Payload CMS 3 embedded** — one process serving the public site, `/admin`,
-the REST/GraphQL API, and uploads. SQLite for storage, self-hosted on EC2 behind a Cloudflare
-Tunnel. No Vercel.
+- **Portfolio** (`tncp.web.id`) — profile, experience, and project write-ups, curated through
+  a Payload admin panel.
+- **KANAL blog** (`blog.tncp.web.id`) — articles served from the same host on the `blog.`
+  subdomain, populated by an external content pipeline through an `INGEST_SECRET`-guarded
+  ingest API (that pipeline lives in a separate private repo).
 
-The blog (`blog.tncp.web.id`) is served by the same app and fed by the separate
-[PAI](https://github.com/TNCP06/PAI) content pipeline through an `INGEST_SECRET`-guarded
-ingest API.
+Both are one **pnpm workspaces + Turborepo** monorepo. The Phase 1 app, `apps/web`, is Next.js
+(App Router) with **Payload CMS 3 embedded** — a single process serving the public site,
+`/admin`, the REST/GraphQL API, and uploads. SQLite for storage, self-hosted on EC2 behind a
+Cloudflare Tunnel. No Vercel.
+
+## How it's put together
+
+```
+        visitors
+            │
+   ┌────────┴─────────┐
+   │                   │
+tncp.web.id     blog.tncp.web.id
+(portfolio)          (KANAL)
+   │                   │
+   └────────┬──────────┘
+            │
+     one website (this repo)
+   ┌────────┴──────────┐
+   │  admin panel       │  ← where content gets written & published
+   │  (built in, /admin)│
+   └────────┬──────────┘
+            │
+        database
+     (1 file, on the
+      same server)
+```
+
+In plain terms:
+
+- The portfolio and the blog are **two sides of the same website** — same server, same
+  database, just a different address. Not two separate projects.
+- Content is written and published through an **admin panel that comes built in** — no
+  separate CMS app to install or host.
+- Blog posts can also come in automatically from a separate AI writing tool, but they always
+  land as a **draft first** — nothing goes public until someone hits publish.
+- It runs on the owner's own server, not a paid hosting platform (no Vercel).
+
+## Features
+
+- **Bilingual content model** — every field can hold Indonesian + English; the public site
+  doesn't switch languages yet (no locale picker), that's wired up in a later phase.
+- **Portfolio entries** — projects, work experience, education; hidden until published, then
+  shown with the important ones first.
+- **Blog articles** — tagged and sorted into categories (tech, film, kpop, hiburan, tips),
+  with reading time, RSS, and a sitemap.
+- **Two ways in, one rule** — a person can publish through `/admin`; an automated pipeline can
+  only ever save a draft, never publish or delete anything on its own.
+
+## Content flow
+
+Write (by hand, or as an automatic draft) → someone hits publish → the page goes live right
+away — no restart, no rebuild.
 
 ## Quick start (local dev)
 
