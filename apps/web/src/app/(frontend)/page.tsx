@@ -11,7 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const profile = await getProfile();
   return {
     title: profile.fullName || "Tionusa Catur Pamungkas",
-    description: profile.headline || "Backend developer — systems, data, and cloud.",
+    description: profile.headline || "Fullstack developer — systems, data, and cloud.",
   };
 }
 
@@ -38,7 +38,7 @@ export default async function Home() {
                   aria-hidden="true"
                 />
                 <span className="mono">
-                  {profile.headline ? "Backend Developer" : "Portfolio"}
+                  {profile.headline ? "Fullstack Developer" : "Portfolio"}
                   {profile.availableForWork ? " · Available for work" : ""}
                 </span>
               </p>
@@ -84,8 +84,8 @@ export default async function Home() {
                 <div className="terminal-output">tionusa-catur-pamungkas</div>
                 <div className="terminal-line"><span className="terminal-prompt">$</span> cat focus.json</div>
                 <div className="terminal-output JSON">{"{"}</div>
-                <div className="terminal-output JSON indent">"role": "Backend Developer",</div>
-                <div className="terminal-output JSON indent">"stack": ["Node.js", "Docker", "AWS", "SQLite"],</div>
+                <div className="terminal-output JSON indent">"role": "Fullstack Developer",</div>
+                <div className="terminal-output JSON indent">"stack": ["Node.js", "Docker", "AWS", "SQLite", "etc"],</div>
                 <div className="terminal-output JSON indent">"available": {profile.availableForWork ? "true" : "false"}</div>
                 <div className="terminal-output JSON">{"}"}</div>
                 <div className="terminal-line"><span className="terminal-prompt">$</span> ping -c 1 tncp.web.id</div>

@@ -106,7 +106,7 @@ const run = async (): Promise<void> => {
     slug: "profile",
     data: {
       fullName: "Tionusa Catur Pamungkas",
-      headline: "Backend developer building messaging, data, and cloud systems.",
+      headline: "Fullstack developer building messaging, data, and cloud systems.",
       location: "Malang, Indonesia",
       availableForWork: true,
       bio: lex(

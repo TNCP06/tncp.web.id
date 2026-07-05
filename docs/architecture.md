@@ -4,7 +4,7 @@
 
 ## Context & goal
 
-`tncp.web.id` is the personal profile + portfolio site of Tionusa Catur Pamungkas (backend developer). Audience: recruiters and engineers. Content is curated manually now via the Payload admin; an AI agent curates it in Phase 3 (separate app/repo).
+`tncp.web.id` is the personal profile + portfolio site of Tionusa Catur Pamungkas (fullstack developer). Audience: recruiters and engineers. Content is curated manually now via the Payload admin; an AI agent curates it in Phase 3 (separate app/repo).
 
 ## Components
 

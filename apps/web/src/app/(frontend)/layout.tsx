@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     default: "Tionusa Catur Pamungkas",
     template: "%s · Tionusa Catur Pamungkas",
   },
-  description: "Backend developer — systems, data, and cloud.",
+  description: "Fullstack developer — systems, data, and cloud.",
 };
 
 export default function FrontendLayout({
