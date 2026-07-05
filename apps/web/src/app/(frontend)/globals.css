@@ -286,6 +286,24 @@ img {
   transform: scaleX(1);
 }
 
+.nav-brand-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.nav-github {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-muted, var(--ink));
+  transition: color 0.2s ease;
+}
+
+.nav-github:hover {
+  color: var(--ink);
+}
+
 .nav-links {
   display: flex;
   align-items: center;
