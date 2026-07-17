@@ -27,7 +27,12 @@ export function middleware(req: NextRequest) {
   return trackVisit(req, NextResponse.next());
 }
 
-const BOT_UA = /bot|crawl|spider|slurp|preview|scan|fetch|monitor|probe|curl|wget|python|go-http|headless|lighthouse/i;
+const BOT_UA = /bot|crawl|spider|slurp|preview|scan|fetch|monitor|probe|curl|wget|python|go-http|headless|lighthouse|facebookexternal|meta-external/i;
+
+// Meta's link-preview crawler browses with a real-browser UA, so the UA filter
+// misses it — but it always comes from Meta's IP space. ponytail: prefix
+// strings, not a full ASN list; extend when another crawler shows up in logs.
+const BOT_IP_PREFIXES = ["2a03:288", "173.252.", "69.171.", "66.220."];
 
 // Visitor → Telegram notification. Middleware only decides "is this a real
 // page view by someone who isn't the owner"; persistence + per-IP dedup live
@@ -64,6 +69,11 @@ function trackVisit(req: NextRequest, res: NextResponse): NextResponse {
     return res;
   }
 
+  const ip =
+    req.headers.get("cf-connecting-ip") ||
+    (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim();
+  if (BOT_IP_PREFIXES.some((p) => ip.startsWith(p))) return res;
+
   // Fire-and-forget to our own port — never block or fail the page.
   void fetch(`http://127.0.0.1:${process.env.PORT || "3000"}/api/visit`, {
     method: "POST",
@@ -74,9 +84,7 @@ function trackVisit(req: NextRequest, res: NextResponse): NextResponse {
     body: JSON.stringify({
       path: pathname,
       host: host.startsWith("blog.") ? "blog" : "site",
-      ip:
-        req.headers.get("cf-connecting-ip") ||
-        (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim(),
+      ip,
       country: req.headers.get("cf-ipcountry") ?? "",
       userAgent: ua,
       referer: req.headers.get("referer") ?? "",
