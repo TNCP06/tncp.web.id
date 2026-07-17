@@ -53,6 +53,7 @@ export async function GET(req: NextRequest) {
       path: d.path,
       host: d.host,
       country: d.country ?? "",
+      ip: d.ip ?? "",
       referer: d.referer ?? "",
       at: d.createdAt,
     })),

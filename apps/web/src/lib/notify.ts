@@ -24,6 +24,7 @@ type Visit = {
   path: string;
   host?: string | null;
   country?: string | null;
+  ip?: string | null;
   referer?: string | null;
   userAgent?: string | null;
 };
@@ -38,6 +39,7 @@ export function notifyVisitor(payload: Payload, v: Visit): void {
   const text =
     `👀 Pengunjung — ${site}${v.country ? ` (${v.country})` : ""}\n` +
     `Halaman: ${v.path}\n` +
+    (v.ip ? `IP: ${v.ip}\n` : "") +
     (v.referer ? `Dari: ${v.referer}\n` : "") +
     (v.userAgent ? `UA: ${v.userAgent.slice(0, 120)}` : "");
   void postTelegram(payload, text);
