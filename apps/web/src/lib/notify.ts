@@ -63,7 +63,7 @@ async function postTelegram(payload: Payload, text: string): Promise<void> {
     const res = await fetch(`${TG_API}/bot${token}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: chatId, text }),
+      body: JSON.stringify({ chat_id: chatId, text, disable_web_page_preview: true }),
     });
     if (!res.ok) {
       payload.logger.error(`Telegram notify failed: ${res.status} ${await res.text()}`);
