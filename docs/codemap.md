@@ -1,6 +1,6 @@
 # Code map
 
-> Last verified against code: 2026-07-17 (Blog Phase 2 + Portfolio Phase 3 ingest)
+> Last verified against code: 2026-07-17 (visitor notifications + PAI stats endpoint)
 > Purpose: token-cheap entry point. For each area, read only the files listed.
 
 | Area | Read |
@@ -8,14 +8,14 @@
 | Root tooling | `package.json`, `pnpm-workspace.yaml`, `turbo.json`, `.env.example` |
 | Payload config (SMTP email adapter, prodMigrations) | `apps/web/src/payload.config.ts` |
 | DB migrations (prod schema) | `apps/web/src/migrations/*` |
-| Collections | `apps/web/src/collections/{Users,Media,PortfolioEntries,Articles,Messages}.ts` |
+| Collections | `apps/web/src/collections/{Users,Media,PortfolioEntries,Articles,Messages,VisitorLogs}.ts` |
 | Globals | `apps/web/src/globals/Profile.ts` |
 | Access control + agent guardrails | `apps/web/src/access.ts` |
 | Slug helper | `apps/web/src/fields/slug.ts` |
 | Revalidation hooks | `apps/web/src/hooks/revalidate.ts` (guarded for CLI context) |
 | Data layer (Local API + cache tags) | `apps/web/src/lib/payload.ts` |
 | Display helpers (period, labels) | `apps/web/src/lib/format.ts` |
-| Contact notify (email + Telegram, both fire) | `apps/web/src/lib/notify.ts` |
+| Contact + visitor notify (email + Telegram) | `apps/web/src/lib/notify.ts` |
 | Homepage | `apps/web/src/app/(frontend)/page.tsx` |
 | Nav + theme toggle | `apps/web/src/app/(frontend)/components/{SiteNav,ThemeToggle}.tsx` |
 | Portfolio list + item card | `apps/web/src/app/(frontend)/components/ProjectLedger.tsx` |
@@ -31,7 +31,8 @@
 | REST + GraphQL API | `apps/web/src/app/(payload)/api/**` |
 | Healthcheck | `apps/web/src/app/(payload)/api/health/route.ts` (static, shadows `/api/[...slug]`) |
 | Dev seed | `apps/web/scripts/seed.ts` (run: `pnpm --filter web seed`) |
-| Host middleware (`blog.*` host → rewrites to `/_blog/*`) | `apps/web/src/middleware.ts` |
+| Host middleware (`blog.*` rewrite + visitor detection) | `apps/web/src/middleware.ts` |
+| Visitor log endpoint (dedup + persist, internal) | `apps/web/src/app/(frontend)/api/visit/route.ts` |
 | Blog (KANAL) layout + nav + theme toggle | `apps/web/src/app/(blog)/layout.tsx`, `(blog)/blog.css`, `(blog)/components/{BlogNav,ThemeToggle}.tsx` |
 | Blog hero carousel + article card | `apps/web/src/app/(blog)/components/{Hero,ArticleCard}.tsx` |
 | Blog index (category tabs) + article page | `apps/web/src/app/(blog)/%5Fblog/page.tsx`, `%5Fblog/[slug]/page.tsx` |
@@ -40,6 +41,7 @@
 | Ingest helpers (markdown→Lexical, reading time) | `apps/web/src/lib/ingest.ts` |
 | Ingest API — articles (create/update draft, publish) — `INGEST_SECRET`-guarded | `apps/web/src/app/(payload)/api/ingest/article/route.ts`, `.../[id]/publish/route.ts` |
 | Ingest API — portfolio (draft with manual-edit protection, publish) | `apps/web/src/app/(payload)/api/ingest/portfolio/route.ts`, `.../[id]/publish/route.ts` |
+| Ingest API — visitor stats (read-only, for PAI 👀 menu) | `apps/web/src/app/(payload)/api/ingest/visitors/route.ts` |
 | Backup | *(Stage F)* `scripts/backup.sh` |
 | CI/CD | *(Stage E)* `.github/workflows/*`, `apps/web/Dockerfile`, `docker-compose.yml` |
 
@@ -50,6 +52,7 @@ Notes:
 - Data reads are wrapped in `unstable_cache` with tags (`profile`, `portfolio-entries`, `portfolio-entry:<slug>`); Payload `afterChange`/`afterDelete` hooks bust them. Revalidation is skipped when Payload runs outside a request (seed/CLI).
 - Schema in prod: Payload disables `push` when `NODE_ENV=production`, so the VPS creates tables via **migrations** (`prodMigrations` runs on connect). Dev still uses push. After any schema change (new collection/field): `pnpm --filter web payload migrate:create <name>` and commit the generated files — otherwise new tables won't exist in prod.
 - Contact flow: form → `POST /api/contact` (rate-limit + honeypot + length caps) → `messages` create → collection `afterChange` fires `notifyNewMessage` (email + Telegram, fire-and-forget). Telegram uses `TG_BOT_TOKEN` + `CONTACT_TG_CHAT_ID` (owner's **personal** chat, separate from the backup storage channel); email needs the `SMTP_*` block. Missing env = that channel silently skipped.
+- Visitor notifications: `middleware.ts` flags real page views (GET + `text/html`, non-bot UA, not `/admin`//`/api`/files) and fire-and-forgets them to `POST /api/visit` (same `INGEST_SECRET` bearer). That route dedups in-memory (1/IP/hour), writes a `visitor-logs` row, and the collection's `afterChange` sends the Telegram ping via `notifyVisitor` (same `TG_BOT_TOKEN`/`CONTACT_TG_CHAT_ID`). Owner is excluded automatically: seeing a `payload-token` cookie (any `/admin` login) sets a 1-year `tncp_owner` cookie on `.tncp.web.id` (covers `blog.`), and both cookies skip tracking. PAI reads aggregates via `GET /api/ingest/visitors`.
 - Blog: `blog.tncp.web.id` hits `middleware.ts`, which rewrites to the `(blog)` route group's `_blog/*` segment (folder name `%5Fblog` on disk — Next treats a literal `_` prefix as a private, non-routable folder, so the underscore is URL-encoded to opt back into routing). `SiteNav`'s "Blog" link only renders when `NEXT_PUBLIC_BLOG_URL` is non-empty (empty hides it, e.g. local dev before the subdomain exists). Ingest routes check `Authorization: Bearer <INGEST_SECRET>`; missing/empty secret always rejects (401). The consumer is the PAI pipeline (separate repo); the full contract lives in `../Personal-Assistant-AI/INTEGRATION.md` — update it whenever the ingest routes or the Articles/PortfolioEntries schema change.
 
 Update this table whenever the structure changes.

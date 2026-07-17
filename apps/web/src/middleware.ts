@@ -22,9 +22,67 @@ export function middleware(req: NextRequest) {
   ) {
     const url = req.nextUrl.clone();
     url.pathname = `/_blog${pathname}`;
-    return NextResponse.rewrite(url);
+    return trackVisit(req, NextResponse.rewrite(url));
   }
-  return NextResponse.next();
+  return trackVisit(req, NextResponse.next());
+}
+
+const BOT_UA = /bot|crawl|spider|slurp|preview|scan|fetch|monitor|probe|curl|wget|python|go-http|headless|lighthouse/i;
+
+// Visitor → Telegram notification. Middleware only decides "is this a real
+// page view by someone who isn't the owner"; persistence + per-IP dedup live
+// in /api/visit (Node runtime — middleware can't touch Payload/SQLite).
+function trackVisit(req: NextRequest, res: NextResponse): NextResponse {
+  const ua = req.headers.get("user-agent") ?? "";
+  const accept = req.headers.get("accept") ?? "";
+  const { pathname } = req.nextUrl;
+  if (
+    req.method !== "GET" ||
+    !accept.includes("text/html") || // excludes RSC/prefetch/data requests
+    !ua ||
+    BOT_UA.test(ua) ||
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/api") ||
+    /\.\w+$/.test(pathname) // files: sitemap.xml, robots.txt, images…
+  ) {
+    return res;
+  }
+
+  // Owner filter: after one /admin login the `payload-token` cookie appears;
+  // convert it into a 1-year `tncp_owner` cookie scoped to .tncp.web.id so it
+  // also covers blog. — the owner's visits are never counted again.
+  const host = req.headers.get("host") ?? "";
+  if (req.cookies.has("payload-token") || req.cookies.has("tncp_owner")) {
+    if (req.cookies.has("payload-token")) {
+      res.cookies.set("tncp_owner", "1", {
+        maxAge: 60 * 60 * 24 * 365,
+        httpOnly: true,
+        sameSite: "lax",
+        ...(host.endsWith("tncp.web.id") ? { domain: ".tncp.web.id" } : {}),
+      });
+    }
+    return res;
+  }
+
+  // Fire-and-forget to our own port — never block or fail the page.
+  void fetch(`http://127.0.0.1:${process.env.PORT || "3000"}/api/visit`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      authorization: `Bearer ${process.env.INGEST_SECRET ?? ""}`,
+    },
+    body: JSON.stringify({
+      path: pathname,
+      host: host.startsWith("blog.") ? "blog" : "site",
+      ip:
+        req.headers.get("cf-connecting-ip") ||
+        (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim(),
+      country: req.headers.get("cf-ipcountry") ?? "",
+      userAgent: ua,
+      referer: req.headers.get("referer") ?? "",
+    }),
+  }).catch(() => {});
+  return res;
 }
 
 export const config = {

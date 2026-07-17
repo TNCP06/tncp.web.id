@@ -72,6 +72,7 @@ export interface Config {
     'portfolio-entries': PortfolioEntry;
     articles: Article;
     messages: Message;
+    'visitor-logs': VisitorLog;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -84,6 +85,7 @@ export interface Config {
     'portfolio-entries': PortfolioEntriesSelect<false> | PortfolioEntriesSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
     messages: MessagesSelect<false> | MessagesSelect<true>;
+    'visitor-logs': VisitorLogsSelect<false> | VisitorLogsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -218,6 +220,7 @@ export interface PortfolioEntry {
   gallery?: (number | Media)[] | null;
   featured?: boolean | null;
   priorityScore?: number | null;
+  externalId?: string | null;
   /**
    * Set by the Phase 3 AI agent; leave defaults for manual entries.
    */
@@ -300,6 +303,21 @@ export interface Message {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "visitor-logs".
+ */
+export interface VisitorLog {
+  id: number;
+  path: string;
+  host?: ('site' | 'blog') | null;
+  country?: string | null;
+  ip?: string | null;
+  userAgent?: string | null;
+  referer?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -341,6 +359,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'messages';
         value: number | Message;
+      } | null)
+    | ({
+        relationTo: 'visitor-logs';
+        value: number | VisitorLog;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -456,6 +478,7 @@ export interface PortfolioEntriesSelect<T extends boolean = true> {
   gallery?: T;
   featured?: T;
   priorityScore?: T;
+  externalId?: T;
   curation?:
     | T
     | {
@@ -508,6 +531,20 @@ export interface MessagesSelect<T extends boolean = true> {
   email?: T;
   message?: T;
   readStatus?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "visitor-logs_select".
+ */
+export interface VisitorLogsSelect<T extends boolean = true> {
+  path?: T;
+  host?: T;
+  country?: T;
+  ip?: T;
+  userAgent?: T;
+  referer?: T;
   updatedAt?: T;
   createdAt?: T;
 }

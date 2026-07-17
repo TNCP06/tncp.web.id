@@ -2,6 +2,7 @@ import * as migration_20260703_092811_initial from './20260703_092811_initial';
 import * as migration_20260703_202158_blog_phase2_articles from './20260703_202158_blog_phase2_articles';
 import * as migration_20260703_214240_add_article_published_at from './20260703_214240_add_article_published_at';
 import * as migration_20260704_171630_portfolio_external_id from './20260704_171630_portfolio_external_id';
+import * as migration_20260717_073201_visitor_logs from './20260717_073201_visitor_logs';
 
 export const migrations = [
   {
@@ -22,6 +23,11 @@ export const migrations = [
   {
     up: migration_20260704_171630_portfolio_external_id.up,
     down: migration_20260704_171630_portfolio_external_id.down,
-    name: '20260704_171630_portfolio_external_id'
+    name: '20260704_171630_portfolio_external_id',
+  },
+  {
+    up: migration_20260717_073201_visitor_logs.up,
+    down: migration_20260717_073201_visitor_logs.down,
+    name: '20260717_073201_visitor_logs'
   },
 ];

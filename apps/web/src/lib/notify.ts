@@ -20,16 +20,42 @@ export function notifyNewMessage(payload: Payload, msg: NewMessage): void {
   void sendEmail(payload, msg);
 }
 
-async function sendTelegram(payload: Payload, msg: NewMessage): Promise<void> {
-  const token = process.env.TG_BOT_TOKEN;
-  const chatId = process.env.CONTACT_TG_CHAT_ID;
-  if (!token || !chatId) return;
+type Visit = {
+  path: string;
+  host?: string | null;
+  country?: string | null;
+  referer?: string | null;
+  userAgent?: string | null;
+};
 
+/**
+ * Telegram ping for a real page view (bots/owner already filtered by the
+ * middleware, deduped per IP per hour by /api/visit). Fire-and-forget like
+ * the contact notification: the visit row is already persisted.
+ */
+export function notifyVisitor(payload: Payload, v: Visit): void {
+  const site = v.host === "blog" ? "blog.tncp.web.id" : "tncp.web.id";
+  const text =
+    `👀 Pengunjung — ${site}${v.country ? ` (${v.country})` : ""}\n` +
+    `Halaman: ${v.path}\n` +
+    (v.referer ? `Dari: ${v.referer}\n` : "") +
+    (v.userAgent ? `UA: ${v.userAgent.slice(0, 120)}` : "");
+  void postTelegram(payload, text);
+}
+
+async function sendTelegram(payload: Payload, msg: NewMessage): Promise<void> {
   const text =
     `📬 New contact message\n\n` +
     `Name: ${msg.name}\n` +
     `Email: ${msg.email}\n\n` +
     msg.message;
+  await postTelegram(payload, text);
+}
+
+async function postTelegram(payload: Payload, text: string): Promise<void> {
+  const token = process.env.TG_BOT_TOKEN;
+  const chatId = process.env.CONTACT_TG_CHAT_ID;
+  if (!token || !chatId) return;
 
   try {
     const res = await fetch(`${TG_API}/bot${token}/sendMessage`, {

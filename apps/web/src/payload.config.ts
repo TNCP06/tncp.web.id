@@ -11,6 +11,7 @@ import { Media } from "./collections/Media";
 import { PortfolioEntries } from "./collections/PortfolioEntries";
 import { Articles } from "./collections/Articles";
 import { Messages } from "./collections/Messages";
+import { VisitorLogs } from "./collections/VisitorLogs";
 import { Profile } from "./globals/Profile";
 import { migrations } from "./migrations";
 
@@ -36,7 +37,7 @@ export default buildConfig({
         },
       })
     : undefined,
-  collections: [Users, Media, PortfolioEntries, Articles, Messages],
+  collections: [Users, Media, PortfolioEntries, Articles, Messages, VisitorLogs],
   globals: [Profile],
   localization: {
     locales: [
