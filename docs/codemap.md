@@ -1,6 +1,6 @@
 # Code map
 
-> Last verified against code: 2026-07-04 (Stage C/D + contact form/messages & owner notifications + Blog Phase 2)
+> Last verified against code: 2026-07-17 (Blog Phase 2 + Portfolio Phase 3 ingest)
 > Purpose: token-cheap entry point. For each area, read only the files listed.
 
 | Area | Read |
@@ -38,7 +38,8 @@
 | Blog SEO (sitemap, RSS, robots) | `apps/web/src/app/(blog)/%5Fblog/sitemap.ts`, `%5Fblog/rss.xml/route.ts`, `%5Fblog/robots.txt/route.ts` |
 | Blog data layer (cached Local API queries) | `apps/web/src/lib/blog.ts` |
 | Ingest helpers (markdown→Lexical, reading time) | `apps/web/src/lib/ingest.ts` |
-| Ingest API (create/update draft, publish) — `INGEST_SECRET`-guarded | `apps/web/src/app/(payload)/api/ingest/article/route.ts`, `.../[id]/publish/route.ts` |
+| Ingest API — articles (create/update draft, publish) — `INGEST_SECRET`-guarded | `apps/web/src/app/(payload)/api/ingest/article/route.ts`, `.../[id]/publish/route.ts` |
+| Ingest API — portfolio (draft with manual-edit protection, publish) | `apps/web/src/app/(payload)/api/ingest/portfolio/route.ts`, `.../[id]/publish/route.ts` |
 | Backup | *(Stage F)* `scripts/backup.sh` |
 | CI/CD | *(Stage E)* `.github/workflows/*`, `apps/web/Dockerfile`, `docker-compose.yml` |
 
@@ -49,6 +50,6 @@ Notes:
 - Data reads are wrapped in `unstable_cache` with tags (`profile`, `portfolio-entries`, `portfolio-entry:<slug>`); Payload `afterChange`/`afterDelete` hooks bust them. Revalidation is skipped when Payload runs outside a request (seed/CLI).
 - Schema in prod: Payload disables `push` when `NODE_ENV=production`, so the VPS creates tables via **migrations** (`prodMigrations` runs on connect). Dev still uses push. After any schema change (new collection/field): `pnpm --filter web payload migrate:create <name>` and commit the generated files — otherwise new tables won't exist in prod.
 - Contact flow: form → `POST /api/contact` (rate-limit + honeypot + length caps) → `messages` create → collection `afterChange` fires `notifyNewMessage` (email + Telegram, fire-and-forget). Telegram uses `TG_BOT_TOKEN` + `CONTACT_TG_CHAT_ID` (owner's **personal** chat, separate from the backup storage channel); email needs the `SMTP_*` block. Missing env = that channel silently skipped.
-- Blog: `blog.tncp.web.id` hits `middleware.ts`, which rewrites to the `(blog)` route group's `_blog/*` segment (folder name `%5Fblog` on disk — Next treats a literal `_` prefix as a private, non-routable folder, so the underscore is URL-encoded to opt back into routing). `SiteNav`'s "Blog" link only renders when `NEXT_PUBLIC_BLOG_URL` is non-empty (empty hides it, e.g. local dev before the subdomain exists). Ingest routes check `Authorization: Bearer <INGEST_SECRET>`; missing/empty secret always rejects (401).
+- Blog: `blog.tncp.web.id` hits `middleware.ts`, which rewrites to the `(blog)` route group's `_blog/*` segment (folder name `%5Fblog` on disk — Next treats a literal `_` prefix as a private, non-routable folder, so the underscore is URL-encoded to opt back into routing). `SiteNav`'s "Blog" link only renders when `NEXT_PUBLIC_BLOG_URL` is non-empty (empty hides it, e.g. local dev before the subdomain exists). Ingest routes check `Authorization: Bearer <INGEST_SECRET>`; missing/empty secret always rejects (401). The consumer is the PAI pipeline (separate repo); the full contract lives in `../Personal-Assistant-AI/INTEGRATION.md` — update it whenever the ingest routes or the Articles/PortfolioEntries schema change.
 
 Update this table whenever the structure changes.

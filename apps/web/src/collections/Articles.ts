@@ -46,6 +46,8 @@ export const Articles: CollectionConfig = {
       type: "select",
       required: true,
       defaultValue: "tech",
+      // Mirrored by PAI's GENRE_CATEGORY (pipeline/stages.py) — change both sides.
+      // Contract: ../Personal-Assistant-AI/INTEGRATION.md
       options: [
         { label: "Hiburan", value: "hiburan" },
         { label: "K-Pop", value: "kpop" },

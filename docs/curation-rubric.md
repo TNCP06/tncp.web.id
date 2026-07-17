@@ -1,6 +1,6 @@
 # Curation rubric (Phase 3 AI agent)
 
-> Last verified against code: 2026-07-03 (reference doc; the agent lives in a separate app/repo)
+> Last verified against code: 2026-07-17 (the agent is the PAI pipeline — `Personal-Assistant-AI` repo, `pipeline/portfolio.py`; weights mirrored in its `RUBRIC_WEIGHTS`)
 
 Score each portfolio candidate 0–5 per criterion × weight. `priorityScore` = total (max 50).
 
@@ -17,7 +17,8 @@ Score each portfolio candidate 0–5 per criterion × weight. `priorityScore` = 
 - ≥30 → propose.
 - 20–29 → propose with notes.
 - <20 → reject with reason.
-- `featured` = top 3.
+- `featured` = only repos pinned via PAI's `PORTFOLIO_PIN` env; no automatic top-3
+  (the owner toggles featured in `/admin`).
 
 ## Guardrails
 
