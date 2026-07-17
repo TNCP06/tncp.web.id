@@ -29,10 +29,18 @@ export function middleware(req: NextRequest) {
 
 const BOT_UA = /bot|crawl|spider|slurp|preview|scan|fetch|monitor|probe|curl|wget|python|go-http|headless|lighthouse|facebookexternal|meta-external/i;
 
-// Meta's link-preview crawler browses with a real-browser UA, so the UA filter
-// misses it — but it always comes from Meta's IP space. ponytail: prefix
+// Crawlers/scanners that browse with a real-browser UA, so the UA filter
+// misses them — but they come from known datacenter IP space. ponytail: prefix
 // strings, not a full ASN list; extend when another crawler shows up in logs.
-const BOT_IP_PREFIXES = ["2a03:288", "173.252.", "69.171.", "66.220."];
+const BOT_IP_PREFIXES = [
+  "2a03:288", // Meta link-preview
+  "173.252.", // Meta
+  "69.171.", // Meta
+  "66.220.", // Meta
+  "192.36.109.", // urlscan.io scan cluster (Internetbolaget, SE)
+  "158.173.", // IBM Cloud / SoftLayer (Frankfurt scanner seen in logs)
+  "34.", // Google Cloud + AWS block (34.0.0.0/8 is all cloud, no humans)
+];
 
 // Visitor → Telegram notification. Middleware only decides "is this a real
 // page view by someone who isn't the owner"; persistence + per-IP dedup live
