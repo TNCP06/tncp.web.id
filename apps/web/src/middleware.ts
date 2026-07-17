@@ -46,6 +46,9 @@ function trackVisit(req: NextRequest, res: NextResponse): NextResponse {
     !accept.includes("text/html") || // excludes RSC/prefetch/data requests
     !ua ||
     BOT_UA.test(ua) ||
+    // real WebKit/Blink browsers always carry "(KHTML, like Gecko)"; an
+    // AppleWebKit UA without it is a hand-typed fake (scraper signature)
+    (ua.includes("AppleWebKit") && !ua.includes("KHTML, like Gecko")) ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/api") ||
     /\.\w+$/.test(pathname) // files: sitemap.xml, robots.txt, images…
