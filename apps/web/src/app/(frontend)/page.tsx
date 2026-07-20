@@ -58,8 +58,8 @@ export default async function Home() {
       {/* ── Hero: editorial split ─────────────────────────────── */}
       <header className="hero">
         <div className="wrap">
-          <div className="hero-grid">
-            <div className="hero-info">
+          <div className="hero-grid" style={{ gridTemplateColumns: "1fr" }}>
+            <div className="hero-info" style={{ maxWidth: "60ch" }}>
               <p className="eyebrow">
                 <span
                   className={`status-dot${profile.availableForWork ? " status-dot--ok" : ""}`}
@@ -84,20 +84,13 @@ export default async function Home() {
                 <Link className="btn" href="/portfolio">
                   View portfolio
                 </Link>
-
+                {cvUrl ? (
+                  <a className="btn" href={cvUrl} target="_blank" rel="noreferrer">
+                    Download CV
+                  </a>
+                ) : null}
               </div>
-
-
             </div>
-
-            <figure className="hero-figure" style={{ margin: 0 }}>
-              {photoUrl ? (
-                <img src={photoUrl} alt="Tionusa" loading="eager" />
-              ) : (
-                <div className="hero-figure-empty">TNCP</div>
-              )}
-              <figcaption>Tionusa · Fullstack</figcaption>
-            </figure>
           </div>
         </div>
       </header>
@@ -114,38 +107,12 @@ export default async function Home() {
               <div className="prose">
                 <RichText data={profile.bio} />
               </div>
-              <div className="panel" style={{ color: "var(--ink)" }}>
-                <p className="mono" style={{ marginBottom: "1.5rem", color: "var(--gold)" }}>[ Professional Record ]</p>
-                <dl className="meta-grid" style={{ gridTemplateColumns: "1fr", gap: "1.25rem", marginTop: 0, paddingTop: 0, border: 0 }}>
-                  {profile.location ? (
-                    <div className="meta-item" style={{ flex: "none" }}>
-                      <dt style={{ color: "var(--slate)" }}>Location</dt>
-                      <dd>{profile.location}</dd>
-                    </div>
-                  ) : null}
-                  <div className="meta-item" style={{ flex: "none" }}>
-                    <dt style={{ color: "var(--slate)" }}>Status</dt>
-                    <dd>{profile.availableForWork ? "Open to freelance" : "Currently booked"}</dd>
-                  </div>
-                  {profile.email ? (
-                    <div className="meta-item" style={{ flex: "none" }}>
-                      <dt style={{ color: "var(--slate)" }}>Email</dt>
-                      <dd style={{ wordBreak: "break-all" }}>{profile.email}</dd>
-                    </div>
-                  ) : null}
-                  <div className="meta-item" style={{ flex: "none" }}>
-                    <dt style={{ color: "var(--slate)" }}>Languages</dt>
-                    <dd>ID / EN</dd>
-                  </div>
-                </dl>
-                {cvUrl ? (
-                  <div style={{ marginTop: "2rem" }}>
-                    <a className="btn btn-primary" href={cvUrl} target="_blank" rel="noreferrer" style={{ width: "100%", textAlign: "center" }}>
-                      Download CV ↓
-                    </a>
-                  </div>
-                ) : null}
-              </div>
+              {photoUrl ? (
+                <figure className="about-figure" style={{ margin: 0 }}>
+                  <img src={photoUrl} alt={profile.fullName || "Portrait"} loading="lazy" />
+                  <figcaption>Portrait / {new Date().getFullYear()}</figcaption>
+                </figure>
+              ) : null}
             </div>
           </div>
         </section>
