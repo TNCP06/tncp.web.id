@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -5,6 +8,9 @@ import { ThemeToggle } from "./ThemeToggle";
 const blogUrl = process.env.NEXT_PUBLIC_BLOG_URL || "";
 
 export function SiteNav() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const close = () => setMenuOpen(false);
+
   return (
     <nav className="site-nav">
       <div className="nav-inner wrap">
@@ -31,23 +37,40 @@ export function SiteNav() {
             </svg>
           </a>
         </div>
-        <div className="nav-links">
-          <Link className="nav-link" href="/#work">
-            Work
+        <div className={`nav-links${menuOpen ? " nav-links--open" : ""}`}>
+          <Link className="nav-link" href="/" onClick={close}>
+            Home
           </Link>
-          <Link className="nav-link" href="/#about">
+          <Link className="nav-link" href="/portfolio" onClick={close}>
+            Portfolio
+          </Link>
+          <Link className="nav-link" href="/stack" onClick={close}>
+            Tech Stack
+          </Link>
+          <Link className="nav-link" href="/#about" onClick={close}>
             About
           </Link>
-          <Link className="nav-link" href="/#contact">
-            Contact
-          </Link>
           {blogUrl ? (
-            <a className="nav-link" href={blogUrl}>
+            <a className="nav-link" href={blogUrl} onClick={close}>
               Blog
             </a>
           ) : null}
+          <Link className="nav-cta" href="/#contact" onClick={close}>
+            Contact
+          </Link>
           <ThemeToggle />
         </div>
+        <button
+          className="nav-hamburger"
+          type="button"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={menuOpen}
+        >
+          <span className="hamburger-line" />
+          <span className="hamburger-line" />
+          <span className="hamburger-line" />
+        </button>
       </div>
     </nav>
   );
