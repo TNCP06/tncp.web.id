@@ -32,20 +32,26 @@ export function SiteNav() {
           </a>
         </div>
         <div className="nav-links">
-          <Link className="nav-link" href="/#work">
-            Work
+          <Link className="nav-link" href="/">
+            Home
+          </Link>
+          <Link className="nav-link" href="/portfolio">
+            Portfolio
+          </Link>
+          <Link className="nav-link" href="/stack">
+            Tech Stack
           </Link>
           <Link className="nav-link" href="/#about">
             About
-          </Link>
-          <Link className="nav-link" href="/#contact">
-            Contact
           </Link>
           {blogUrl ? (
             <a className="nav-link" href={blogUrl}>
               Blog
             </a>
           ) : null}
+          <Link className="nav-cta" href="/#contact">
+            Contact
+          </Link>
           <ThemeToggle />
         </div>
       </div>
