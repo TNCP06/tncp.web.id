@@ -5,6 +5,7 @@ import { RichText } from "@payloadcms/richtext-lexical/react";
 import { getEntryBySlug, getProfile } from "@/lib/payload";
 import { ENTRY_TYPE_LABEL, metaLabels, periodOf } from "@/lib/format";
 import { SiteFooter } from "../../components/SiteFooter";
+import { GalleryGrid } from "../../components/GalleryGrid";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -89,11 +90,14 @@ export default async function PortfolioDetail({ params }: Params) {
         ) : null}
 
         {Array.isArray(entry.gallery) && entry.gallery.length > 0 ? (
-          <div className="gallery">
-            {entry.gallery.map((g, i) => {
-              const url = mediaUrl(g);
-              return url ? <img key={i} src={url} alt="" loading="lazy" /> : null;
-            })}
+          <div style={{ marginTop: "3rem" }}>
+            <span className="mono">Gallery</span>
+            <GalleryGrid
+              images={(entry.gallery ?? []).map((g) => ({
+                url: mediaUrl(g) || "",
+                alt: entry.title,
+              })).filter((img) => img.url !== "")}
+            />
           </div>
         ) : null}
 

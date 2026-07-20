@@ -5,6 +5,7 @@ import { getProfile, getPublishedEntries } from "@/lib/payload";
 import { ProjectLedger } from "./components/ProjectLedger";
 import { ContactForm } from "./components/ContactForm";
 import { SiteFooter } from "./components/SiteFooter";
+import { GalleryGrid } from "./components/GalleryGrid";
 
 // Rendered on demand (DB is a runtime volume); data is cached via tags.
 export const dynamic = "force-dynamic";
@@ -29,7 +30,7 @@ export default async function Home() {
   ]);
 
   const blogUrl = process.env.NEXT_PUBLIC_BLOG_URL;
-
+  const cvUrl = mediaUrl(profile.cvFile);
   const photoUrl = mediaUrl(profile.photo);
 
   // Homepage teaser: featured first, capped at 4.
@@ -40,6 +41,16 @@ export default async function Home() {
   const stackCount = new Set(
     entries.flatMap((e) => (e.techStack ?? []).filter(Boolean) as string[]),
   ).size;
+
+  const galleryImages = entries.flatMap((e) =>
+    (e.gallery ?? []).map((g) => ({
+      url: mediaUrl(g),
+      alt: e.title,
+      caption: e.title,
+    })),
+  ).filter(
+    (g): g is { url: string; alt: string; caption: string } => g.url !== null,
+  );
 
   return (
     <>
@@ -99,8 +110,42 @@ export default async function Home() {
               <h2>About Me</h2>
               <span className="mono">Philosophy</span>
             </div>
-            <div className="prose" style={{ maxWidth: "56ch" }}>
-              <RichText data={profile.bio} />
+            <div className="about-grid">
+              <div className="prose">
+                <RichText data={profile.bio} />
+              </div>
+              <div className="panel" style={{ color: "var(--ink)" }}>
+                <p className="mono" style={{ marginBottom: "1.5rem", color: "var(--gold)" }}>[ Professional Record ]</p>
+                <dl className="meta-grid" style={{ gridTemplateColumns: "1fr", gap: "1.25rem", marginTop: 0, paddingTop: 0, border: 0 }}>
+                  {profile.location ? (
+                    <div className="meta-item" style={{ flex: "none" }}>
+                      <dt style={{ color: "var(--slate)" }}>Location</dt>
+                      <dd>{profile.location}</dd>
+                    </div>
+                  ) : null}
+                  <div className="meta-item" style={{ flex: "none" }}>
+                    <dt style={{ color: "var(--slate)" }}>Status</dt>
+                    <dd>{profile.availableForWork ? "Open to freelance" : "Currently booked"}</dd>
+                  </div>
+                  {profile.email ? (
+                    <div className="meta-item" style={{ flex: "none" }}>
+                      <dt style={{ color: "var(--slate)" }}>Email</dt>
+                      <dd style={{ wordBreak: "break-all" }}>{profile.email}</dd>
+                    </div>
+                  ) : null}
+                  <div className="meta-item" style={{ flex: "none" }}>
+                    <dt style={{ color: "var(--slate)" }}>Languages</dt>
+                    <dd>ID / EN</dd>
+                  </div>
+                </dl>
+                {cvUrl ? (
+                  <div style={{ marginTop: "2rem" }}>
+                    <a className="btn btn-primary" href={cvUrl} target="_blank" rel="noreferrer" style={{ width: "100%", textAlign: "center" }}>
+                      Download CV ↓
+                    </a>
+                  </div>
+                ) : null}
+              </div>
             </div>
           </div>
         </section>
@@ -167,6 +212,30 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* ── Curated Gallery Showcase ────────────────────────────────── */}
+      {galleryImages.length > 0 ? (
+        <section className="section" id="gallery" aria-label="Visual Gallery">
+          <div className="wrap">
+            <div className="section-head">
+              <h2>
+                <Link href="/gallery">
+                  Visual Showcase <span className="arrow">→</span>
+                </Link>
+              </h2>
+              <span className="mono">Gallery · {String(galleryImages.length).padStart(2, "0")}</span>
+            </div>
+
+            <GalleryGrid images={galleryImages.slice(0, 6)} />
+
+            <div className="ledger-actions" style={{ marginTop: "3rem" }}>
+              <Link className="btn" href="/gallery">
+                View full visual archive →
+              </Link>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       {/* ── Start a Dialogue ──────────────────────────────────── */}
       <section className="section" id="contact" aria-label="Contact">
         <div className="wrap">
@@ -190,7 +259,17 @@ export default async function Home() {
                     Email me
                   </a>
                 ) : null}
-
+                {(profile.socials ?? []).map((s, i) => (
+                  <a
+                    key={i}
+                    className="btn"
+                    href={s.url}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {s.label} ↗
+                  </a>
+                ))}
               </div>
             </div>
 

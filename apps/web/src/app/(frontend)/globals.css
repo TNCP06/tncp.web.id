@@ -633,7 +633,7 @@ img {
   display: grid;
   grid-template-columns: 1.15fr 1fr;
   gap: clamp(2rem, 6vw, 5rem);
-  align-items: center;
+  align-items: start;
 }
 
 .about-figure {
@@ -1082,19 +1082,151 @@ img {
 .gallery {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
-  gap: 1px;
+  gap: 1.5rem;
   margin-top: 3rem;
-  background: var(--line);
+}
+
+.gallery-item {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  padding: 0;
   border: 1px solid var(--line);
+  background: var(--paper-alt);
+  cursor: pointer;
+  overflow: hidden;
 }
 
-.gallery img {
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   filter: grayscale(100%);
-  transition: filter 0.4s ease;
+  transition: filter 0.4s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.gallery img:hover {
+.gallery-item:hover img {
   filter: grayscale(0%);
+  transform: scale(1.03);
+}
+
+.gallery-item-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(14, 14, 14, 0.85);
+  color: #fff;
+  padding: 0.6rem 0.85rem;
+  opacity: 0;
+  transform: translateY(100%);
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+}
+
+.gallery-item:hover .gallery-item-caption {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Standalone showcase grid (slightly larger) */
+.gallery-showcase {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+/* Lightbox overlay */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.95);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  animation: fadeIn 0.25s ease;
+  backdrop-filter: blur(8px);
+}
+
+.lightbox-img {
+  max-width: 90vw;
+  max-height: 85vh;
+  object-fit: contain;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: transparent;
+  border: 0;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+  z-index: 210;
+}
+
+.lightbox-close:hover {
+  opacity: 1;
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 1.5rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+  font-family: var(--font-mono);
+  z-index: 210;
+}
+
+.lightbox-nav:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.lightbox-prev {
+  left: 2rem;
+}
+
+.lightbox-next {
+  right: 2rem;
+}
+
+.lightbox-counter {
+  position: absolute;
+  bottom: 1.5rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+  z-index: 210;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.97); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 /* ── The Instruments (skills) ──────────────────────────────────── */
