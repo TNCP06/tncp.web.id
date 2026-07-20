@@ -69,6 +69,12 @@
   --nav-bg: rgba(14, 14, 14, 0.82);
 }
 
+/* In dark mode, band-dark uses elevated surface for visual separation */
+[data-theme="dark"] .band-dark {
+  --paper: #1a1a1a;
+  --paper-raised: #222222;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -116,15 +122,10 @@ img {
   outline-offset: 3px;
 }
 
-/* ── Alternating bands (experiment) ────────────────────────────────
-   Navbar is dark, then each top-level band inside `.bands` alternates
-   light / dark down the page; footer stays dark. Palettes are scoped
-   as CSS vars so every child (text, hairlines, buttons) adapts. */
-/* Anchored from the footer (which is dark): the band directly above the
-   footer is light, then it alternates upward. nth-last-child keeps the
-   footer edge correct regardless of how many bands render. */
-.band-light,
-.bands > :nth-last-child(odd) {
+/* ── Manual dark bands ─────────────────────────────────────────────
+   Apply .band-dark to sections that need the obsidian palette.
+   All other sections inherit the default (light) vars from :root. */
+.band-light {
   --paper: #faf9f7;
   --paper-raised: #ffffff;
   --paper-alt: #f2f0ee;
@@ -139,8 +140,7 @@ img {
   color: var(--ink);
 }
 
-.band-dark,
-.bands > :nth-last-child(even) {
+.band-dark {
   --paper: #0e0e0e;
   --paper-raised: #1a1a1a;
   --paper-alt: #161616;
@@ -155,39 +155,7 @@ img {
   color: var(--ink);
 }
 
-/* About Me is always a dark band regardless of parity (declared after the
-   parity rules; specificity 0,2,0 matches and source-order wins). */
-.bands .section-about {
-  --paper: #0e0e0e;
-  --paper-raised: #1a1a1a;
-  --paper-alt: #161616;
-  --ink: #f7f6f4;
-  --ink-muted: #d8d6d3;
-  --slate: #9d9b98;
-  --line: rgba(255, 255, 255, 0.22);
-  --line-strong: rgba(255, 255, 255, 0.45);
-  --gold: #e0bf5a;
-  --gold-soft: rgba(224, 191, 90, 0.16);
-  background-color: var(--paper);
-  color: var(--ink);
-}
 
-/* keep the very top band light so it always contrasts the dark navbar,
-   even when the band count is even (declared last so it wins parity). */
-.bands > :first-child {
-  --paper: #faf9f7;
-  --paper-raised: #ffffff;
-  --paper-alt: #f2f0ee;
-  --ink: #0d0d0d;
-  --ink-muted: #2b2b2b;
-  --slate: #575757;
-  --line: rgba(13, 13, 13, 0.24);
-  --line-strong: rgba(13, 13, 13, 0.5);
-  --gold: #b8912a;
-  --gold-soft: rgba(184, 145, 42, 0.14);
-  background-color: var(--paper);
-  color: var(--ink);
-}
 
 /* ── Shared primitives ─────────────────────────────────────────── */
 .wrap {
@@ -366,6 +334,42 @@ img {
   transform: rotate(25deg);
 }
 
+/* ── Hamburger (mobile) ───────────────────────────────────────── */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0;
+  border: 1px solid var(--line);
+  background: transparent;
+  cursor: pointer;
+  margin-left: 0.4rem;
+}
+
+.hamburger-line {
+  display: block;
+  width: 16px;
+  height: 1.5px;
+  background: var(--ink);
+  margin: 0 auto;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.nav-hamburger[aria-expanded="true"] .hamburger-line:nth-child(1) {
+  transform: translateY(6.5px) rotate(45deg);
+}
+
+.nav-hamburger[aria-expanded="true"] .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.nav-hamburger[aria-expanded="true"] .hamburger-line:nth-child(3) {
+  transform: translateY(-6.5px) rotate(-45deg);
+}
+
 /* ── Buttons ───────────────────────────────────────────────────── */
 .btn {
   font-family: var(--font-mono);
@@ -404,7 +408,7 @@ img {
 
 /* ── Hero (editorial split) ────────────────────────────────────── */
 .hero {
-  padding-block: clamp(2rem, 4vw, 3.25rem) clamp(2rem, 4vw, 3rem);
+  padding-block: clamp(4rem, 8vw, 7rem) clamp(3rem, 5vw, 4rem);
   position: relative;
 }
 
@@ -1587,6 +1591,33 @@ img {
   .footer-brand-block {
     grid-column: 1 / -1;
   }
+  .nav-hamburger {
+    display: flex;
+  }
+  .nav-links {
+    display: none;
+  }
+  .nav-links--open {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    top: 4.75rem;
+    background: #0e0e0e;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    z-index: 99;
+    padding: 2rem;
+  }
+  .nav-links--open .nav-link {
+    font-size: 0.85rem;
+    padding: 1rem 1.5rem;
+  }
+  .nav-links--open .nav-cta {
+    display: inline-flex;
+    margin-top: 1rem;
+  }
 }
 
 @media (max-width: 40rem) {
@@ -1603,9 +1634,7 @@ img {
     width: 100%;
     height: 1px;
   }
-  .nav-cta {
-    display: none;
-  }
+
   .section-head {
     flex-direction: column;
     align-items: flex-start;

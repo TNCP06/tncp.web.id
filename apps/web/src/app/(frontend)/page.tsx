@@ -29,7 +29,7 @@ export default async function Home() {
   ]);
 
   const blogUrl = process.env.NEXT_PUBLIC_BLOG_URL;
-  const cvUrl = mediaUrl(profile.cvFile);
+
   const photoUrl = mediaUrl(profile.photo);
 
   // Homepage teaser: featured first, capped at 4.
@@ -62,10 +62,8 @@ export default async function Home() {
               <h1 className="name">Tionusa</h1>
 
               <p className="headline">
-                Freelance fullstack developer. I build dependable backends —
-                real-time messaging, data pipelines, and cloud infrastructure
-                that scale quietly and stay online. Available now for freelance
-                work.
+                I build dependable backends — data pipelines, cloud
+                infrastructure, and systems that scale quietly.
               </p>
 
               <div className="actions">
@@ -75,20 +73,10 @@ export default async function Home() {
                 <Link className="btn" href="/portfolio">
                   View portfolio
                 </Link>
-                {cvUrl ? (
-                  <a className="btn" href={cvUrl}>
-                    Download CV
-                  </a>
-                ) : null}
+
               </div>
 
-              <div className="hero-meta">
-                {profile.location ? (
-                  <span className="mono">Based · {profile.location}</span>
-                ) : null}
-                <span className="mono">Languages · ID / EN</span>
-                <span className="mono">Est · {new Date().getFullYear()}</span>
-              </div>
+
             </div>
 
             <figure className="hero-figure" style={{ margin: 0 }}>
@@ -105,21 +93,14 @@ export default async function Home() {
 
       {/* ── Philosophy / About ────────────────────────────────── */}
       {profile.bio ? (
-        <section className="section section-about" id="about" aria-label="About">
+        <section className="section band-dark" id="about" aria-label="About">
           <div className="wrap">
-            <div className="about-grid">
-              {photoUrl ? (
-                <figure className="about-figure" style={{ margin: 0 }}>
-                  <img src={photoUrl} alt={profile.fullName || "Portrait"} loading="lazy" />
-                  <figcaption>Portrait / {new Date().getFullYear()}</figcaption>
-                </figure>
-              ) : null}
-              <div className="about-body">
-                <p className="mono" style={{ marginBottom: "1.25rem" }}>About Me</p>
-                <div className="prose">
-                  <RichText data={profile.bio} />
-                </div>
-              </div>
+            <div className="section-head">
+              <h2>About Me</h2>
+              <span className="mono">Philosophy</span>
+            </div>
+            <div className="prose" style={{ maxWidth: "56ch" }}>
+              <RichText data={profile.bio} />
             </div>
           </div>
         </section>
@@ -209,17 +190,7 @@ export default async function Home() {
                     Email me
                   </a>
                 ) : null}
-                {(profile.socials ?? []).map((s, i) => (
-                  <a
-                    key={i}
-                    className="btn"
-                    href={s.url}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {s.label} ↗
-                  </a>
-                ))}
+
               </div>
             </div>
 
